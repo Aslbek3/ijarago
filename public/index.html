@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#145a47">
+<title>IjaraGo — O'zbekiston bo'ylab kvartira ijarasi</title>
+<meta name="description" content="IjaraGo — kunlik va uzoq muddatli kvartira ijarasi. Hudud, narx va xonalar bo'yicha qidiring, xaritada ko'ring, uy egasi bilan bog'laning.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="appbar" id="appbar">
+    <div class="brand-row">
+      <div class="brand">
+        <span class="brand-mark">I</span>
+        <span class="brand-text">
+          <b>IjaraGo</b>
+          <small data-i18n="tagline">Uy topish oson</small>
+        </span>
+      </div>
+      <button type="button" class="pill" id="lang-btn">
+        <span class="pill-icon">🌐</span>
+        <span id="lang-label">UZ</span>
+      </button>
+    </div>
+
+    <div class="hero-body" id="hero-body">
+      <h1 data-i18n="heroTitle">Ijaraga uy qidiryapsizmi?</h1>
+      <p class="hero-sub" data-i18n="heroSub">O'zbekiston bo'ylab e'lonlar — bir joyda.</p>
+      <form id="search-form" class="searchbar">
+        <input type="text" id="search-input" data-i18n-ph="searchPh" placeholder="Hudud yoki tuman...">
+        <button type="submit" data-i18n="search">Qidirish</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="view-wrap">
+
+    <!-- E'LONLAR -->
+    <section id="view-home" class="view active">
+      <div class="tabs" id="type-tabs"></div>
+
+      <div class="filters">
+        <select id="f-region"></select>
+        <select id="f-rooms"></select>
+        <select id="f-price"></select>
+      </div>
+
+      <div class="section-head">
+        <h2 data-i18n="listings">E'lonlar</h2>
+        <span class="section-note" id="home-count"></span>
+      </div>
+      <div id="listing-list" class="card-list"></div>
+    </section>
+
+    <!-- XARITA -->
+    <section id="view-map" class="view">
+      <div class="section-head">
+        <h2 data-i18n="mapTitle">Xaritada</h2>
+        <span class="section-note" id="map-count"></span>
+      </div>
+      <div id="map"></div>
+      <p class="note" data-i18n="mapNote">Xarita internet talab qiladi. Belgini bosing — e'lon ochiladi.</p>
+    </section>
+
+    <!-- SAQLANGAN -->
+    <section id="view-saved" class="view">
+      <div class="section-head">
+        <h2 data-i18n="savedTitle">Saqlangan</h2>
+        <span class="section-note" id="saved-count"></span>
+      </div>
+      <div id="saved-list" class="card-list"></div>
+    </section>
+
+    <!-- E'LON BERISH -->
+    <section id="view-add" class="view">
+      <div class="section-head">
+        <h2 data-i18n="addTitle">E'lon berish</h2>
+      </div>
+      <p class="note" data-i18n="addNote">Demo rejim: e'lon faqat shu brauzerda saqlanadi.</p>
+      <form id="add-form" novalidate>
+        <label for="a-title" data-i18n="fTitle">Sarlavha</label>
+        <input type="text" id="a-title" data-i18n-ph="fTitlePh" placeholder="2 xonali kvartira, markazda">
+        <small class="field-error" id="err-a-title"></small>
+
+        <label for="a-region" data-i18n="fRegion">Hudud</label>
+        <select id="a-region"></select>
+        <small class="field-error" id="err-a-region"></small>
+
+        <label for="a-type" data-i18n="fType">Ijara turi</label>
+        <select id="a-type"></select>
+
+        <label for="a-rooms" data-i18n="fRooms">Xonalar soni</label>
+        <select id="a-rooms"></select>
+
+        <label for="a-price" data-i18n="fPrice">Narxi (so'm)</label>
+        <input type="number" id="a-price" min="0" placeholder="3000000">
+        <small class="field-error" id="err-a-price"></small>
+
+        <label for="a-phone" data-i18n="fPhone">Telefon</label>
+        <input type="tel" id="a-phone" placeholder="+998 90 123 45 67">
+        <small class="field-error" id="err-a-phone"></small>
+
+        <label for="a-tg" data-i18n="fTg">Telegram (ixtiyoriy)</label>
+        <input type="text" id="a-tg" placeholder="@username">
+
+        <label for="a-desc" data-i18n="fDesc">Tavsif</label>
+        <textarea id="a-desc" rows="3" data-i18n-ph="fDescPh" placeholder="Uy haqida qisqacha..."></textarea>
+
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="publish">E'lonni joylash</button>
+      </form>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="home"><b>⌂</b><span data-i18n="navHome">Bosh sahifa</span></button>
+    <button class="nav-btn" data-view="map"><b>🗺</b><span data-i18n="navMap">Xarita</span></button>
+    <button class="nav-btn" data-view="saved"><b>♡</b><span data-i18n="navSaved">Saqlangan</span></button>
+    <button class="nav-btn" data-view="add"><b>＋</b><span data-i18n="navAdd">E'lon</span></button>
+  </nav>
+</div>
+
+<!-- E'LON TAFSILOTI -->
+<div class="modal" id="modal-detail">
+  <div class="sheet">
+    <button class="close" data-close-modal>×</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

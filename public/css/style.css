@@ -1,0 +1,338 @@
+/* ===== IjaraGo — dizayn tizimi =====
+   Tuzilma UstaTop bilan bir xil, faqat brend ranglari almashtirilgan.
+   Ranglar manbai: ChatGPT suhbatidagi asl IjaraGo dizayni. */
+
+:root {
+  --brand:        #17634f;
+  --brand-top:    #145a47;
+  --brand-bottom: #1f8064;
+  --brand-soft:   rgba(255, 255, 255, .16);
+  --brand-dark:   #0f4b3b;
+
+  --bg:          #ffffff;
+  --card:        #ffffff;
+  --tile:        #e4f3ed;
+  --tile-active: #eff8f4;
+  --notice:      #eff8f4;
+  --outer:       #e7eeeb;
+
+  --text:      #131722;
+  --text-2:    #6f7277;
+  --on-brand:  #ffffff;
+  --on-brand-2:#d4e6df;
+
+  --border:      #e7e9ee;
+  --border-soft: #eef0f4;
+
+  --ok:        #157f4a;
+  --warn:      #9a6700;
+  --warn-bg:   #fff4d6;
+  --danger:    #c92a2f;
+  --danger-bg: #fdeced;
+  --muted-bg:  #f1f2f4;
+
+  --r-hero: 24px;
+  --r-card: 14px;
+  --r-tile: 12px;
+  --r-btn:  10px;
+  --r-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, .04);
+  --shadow-pop:  0 8px 24px rgba(16, 24, 40, .12);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; overflow-x: hidden; }
+
+body {
+  font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  color: var(--text);
+  line-height: 1.5;
+  background: var(--outer);
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+button, input, select, textarea { font-family: inherit; font-size: 1rem; }
+
+.app {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Appbar ---------- */
+.appbar {
+  background: linear-gradient(180deg, var(--brand-top), var(--brand-bottom));
+  color: var(--on-brand);
+  padding: 14px 18px 22px;
+  border-radius: 0 0 var(--r-hero) var(--r-hero);
+}
+.appbar.compact { padding-bottom: 16px; }
+.appbar.compact .hero-body { display: none; }
+
+.brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+.brand-mark {
+  width: 40px; height: 40px; flex: none;
+  border-radius: var(--r-card);
+  background: #fff; color: var(--brand);
+  font-weight: 800; font-size: 1.25rem;
+  display: flex; align-items: center; justify-content: center;
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.brand-text b { font-size: 1.15rem; font-weight: 700; }
+.brand-text small { font-size: .78rem; color: var(--on-brand-2); }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  padding: 9px 14px; border: 0; border-radius: var(--r-pill);
+  background: var(--brand-soft); color: var(--on-brand);
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+.pill:hover { background: rgba(255, 255, 255, .24); }
+.pill-icon { font-size: .9rem; }
+
+.hero-body { margin-top: 20px; }
+.hero-body h1 { font-size: 1.6rem; font-weight: 800; line-height: 1.22; letter-spacing: -.01em; }
+.hero-sub { margin-top: 8px; font-size: .9rem; color: var(--on-brand-2); }
+
+.searchbar {
+  margin-top: 18px; display: flex; align-items: center; gap: 8px;
+  background: #fff; border-radius: var(--r-tile); padding: 6px 6px 6px 14px;
+}
+.searchbar input {
+  flex: 1; min-width: 0; border: 0; outline: none;
+  padding: 10px 0; color: var(--text); font-size: .95rem;
+}
+.searchbar input::placeholder { color: #9aa0a6; }
+.searchbar button {
+  flex: none; border: 0; border-radius: var(--r-btn);
+  background: var(--brand); color: #fff;
+  font-weight: 600; font-size: .92rem; padding: 11px 18px; cursor: pointer;
+}
+.searchbar button:hover { background: var(--brand-dark); }
+
+/* ---------- Views ---------- */
+.view-wrap { flex: 1; padding: 22px 18px 28px; overflow-y: auto; }
+.view { display: none; }
+.view.active { display: block; }
+
+.section-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; margin-bottom: 14px;
+}
+.section-head h2 { font-size: 1.18rem; font-weight: 700; letter-spacing: -.01em; }
+.section-note { font-size: .85rem; color: var(--text-2); flex: none; }
+
+.note {
+  font-size: .84rem; color: var(--text-2);
+  background: var(--notice); border-radius: var(--r-btn);
+  padding: 11px 13px; margin-bottom: 16px;
+}
+
+/* ---------- Ijara turi tablari ---------- */
+.tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+.tabs button {
+  flex: 1; border: 1px solid var(--border); background: #fff;
+  border-radius: var(--r-btn); padding: 10px 6px;
+  font-size: .85rem; font-weight: 500; cursor: pointer; color: var(--text);
+}
+.tabs button.active { border-color: var(--brand); background: var(--tile-active); font-weight: 600; color: var(--brand); }
+
+/* ---------- Filtrlar ---------- */
+.filters { display: flex; gap: 8px; margin-bottom: 20px; }
+.filters select {
+  flex: 1; min-width: 0;
+  border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 10px 8px; font-size: .82rem; background: #fff; color: var(--text); outline: none;
+}
+.filters select:focus { border-color: var(--brand); }
+
+/* ---------- E'lon kartasi ---------- */
+.card-list { display: flex; flex-direction: column; gap: 12px; }
+
+.listing {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--r-card); overflow: hidden;
+  cursor: pointer; box-shadow: var(--shadow-card);
+  transition: border-color .15s ease;
+}
+.listing:hover { border-color: #b7d8cb; }
+
+.listing-photo {
+  height: 132px; display: flex; align-items: center; justify-content: center;
+  font-size: 2.6rem; position: relative;
+}
+.listing-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(255, 255, 255, .92); color: var(--brand);
+  font-size: .7rem; font-weight: 700;
+  padding: 4px 10px; border-radius: var(--r-pill);
+}
+.listing-fav {
+  position: absolute; top: 8px; right: 8px;
+  width: 32px; height: 32px; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, .92); cursor: pointer;
+  font-size: 1rem; line-height: 1;
+}
+.listing-body { padding: 12px 14px 14px; }
+.listing-price { font-size: 1.05rem; font-weight: 800; color: var(--brand); }
+.listing-title { font-size: .95rem; font-weight: 600; margin-top: 3px; }
+.listing-meta { font-size: .8rem; color: var(--text-2); margin-top: 4px; }
+
+.empty-state {
+  text-align: center; color: var(--text-2); font-size: .9rem;
+  padding: 32px 16px; background: var(--muted-bg); border-radius: var(--r-card);
+}
+
+/* ---------- Xarita ---------- */
+#map {
+  height: 380px; width: 100%;
+  border-radius: var(--r-card);
+  border: 1px solid var(--border);
+  margin-bottom: 14px;
+  background: var(--tile);
+}
+.leaflet-container { font-family: inherit; border-radius: var(--r-card); }
+
+/* ---------- Tugmalar ---------- */
+.btn {
+  border: 0; border-radius: var(--r-btn);
+  padding: 13px 18px; font-size: .95rem; font-weight: 600; cursor: pointer;
+}
+.btn-primary { background: var(--brand); color: #fff; }
+.btn-primary:hover { background: var(--brand-dark); }
+.btn-secondary { background: var(--muted-bg); color: var(--text); }
+.btn-block { display: block; width: 100%; margin-top: 20px; }
+
+.btn-row { display: flex; gap: 10px; margin-top: 16px; }
+.btn-row .btn { flex: 1; text-align: center; text-decoration: none; line-height: 1.3; }
+.btn-tg { background: #229ED9; color: #fff; }
+
+/* ---------- Forma ---------- */
+#add-form label {
+  display: block; font-size: .82rem; font-weight: 600;
+  color: var(--text-2); margin: 14px 0 6px;
+}
+#add-form input, #add-form select, #add-form textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 11px 13px; font-size: .92rem; background: #fff; color: var(--text); outline: none;
+}
+#add-form input:focus, #add-form select:focus, #add-form textarea:focus { border-color: var(--brand); }
+#add-form input.invalid, #add-form select.invalid { border-color: var(--danger); background: var(--danger-bg); }
+.field-error { display: block; color: var(--danger); font-size: .78rem; margin-top: 5px; }
+
+/* ---------- Modal ---------- */
+.modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(16, 24, 40, .5); z-index: 1000;
+  align-items: flex-end; justify-content: center;
+}
+.modal.open { display: flex; }
+
+.sheet {
+  background: #fff; width: 100%; max-width: 480px; max-height: 88vh;
+  overflow-y: auto; border-radius: 20px 20px 0 0;
+  padding: 24px 20px 28px; position: relative;
+  animation: slide-up .18s ease-out;
+}
+.close {
+  position: absolute; top: 14px; right: 14px;
+  width: 32px; height: 32px; border: 0; border-radius: 50%;
+  background: var(--muted-bg); color: var(--text-2);
+  font-size: 1.2rem; line-height: 1; cursor: pointer; z-index: 2;
+}
+@keyframes slide-up {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------- Tafsilot ---------- */
+.detail-photo {
+  height: 170px; border-radius: var(--r-card);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 3.4rem; margin-bottom: 16px;
+}
+.detail-price { font-size: 1.4rem; font-weight: 800; color: var(--brand); }
+.detail-title { font-size: 1.05rem; font-weight: 600; margin-top: 4px; }
+.detail-meta { font-size: .86rem; color: var(--text-2); margin-top: 6px; }
+
+.detail-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin: 16px 0;
+}
+.detail-cell {
+  background: var(--tile); border-radius: var(--r-tile);
+  padding: 11px 6px; text-align: center;
+}
+.detail-cell b { display: block; font-size: .95rem; }
+.detail-cell span { font-size: .7rem; color: var(--text-2); }
+
+.detail-section { margin-top: 14px; }
+.detail-section h4 { font-size: .8rem; font-weight: 600; color: var(--text-2); margin-bottom: 4px; }
+.detail-section p { font-size: .92rem; }
+
+/* ---------- Pastki navigatsiya ---------- */
+.bottom-nav {
+  display: flex; border-top: 1px solid var(--border);
+  background: #fff; position: sticky; bottom: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; border: 0; background: none; padding: 9px 4px 11px;
+  color: var(--text-2); cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.nav-btn b { font-size: 1.15rem; line-height: 1; font-weight: 400; }
+.nav-btn span { font-size: .68rem; font-weight: 500; }
+.nav-btn.active { color: var(--brand); }
+.nav-btn.active b { font-weight: 700; }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 84px;
+  transform: translate(-50%, 12px);
+  background: #1d2430; color: #fff; font-size: .87rem;
+  padding: 11px 18px; border-radius: var(--r-pill);
+  box-shadow: var(--shadow-pop);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  z-index: 1100; max-width: 90vw; text-align: center;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Desktop ---------- */
+@media (min-width: 900px) {
+  body { padding: 28px 0; }
+  .app {
+    max-width: 1000px; min-height: calc(100vh - 56px);
+    display: grid;
+    grid-template-columns: 232px 1fr;
+    grid-template-areas: "appbar appbar" "nav main";
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 10px 40px rgba(16, 24, 40, .10);
+  }
+  .appbar { grid-area: appbar; border-radius: 0; padding: 20px 28px 26px; }
+  .hero-body h1 { font-size: 1.9rem; }
+  .searchbar { max-width: 560px; }
+  .view-wrap { grid-area: main; padding: 28px 32px 36px; }
+  .bottom-nav {
+    grid-area: nav; flex-direction: column;
+    border-top: 0; border-right: 1px solid var(--border);
+    padding: 18px 12px; gap: 4px; position: static;
+  }
+  .nav-btn {
+    flex: none; flex-direction: row; justify-content: flex-start;
+    gap: 11px; padding: 11px 14px; border-radius: var(--r-btn);
+  }
+  .nav-btn span { font-size: .9rem; }
+  .nav-btn.active { background: var(--tile-active); }
+  .card-list { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  #map { height: 460px; }
+  .modal { align-items: center; }
+  .sheet { border-radius: 18px; max-width: 540px; }
+}
