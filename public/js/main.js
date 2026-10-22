@@ -487,10 +487,18 @@ function openDetail(id, fromHash) {
   const fav = getSaved().includes(item.id);
 
   qs('detail-content').innerHTML = `
-    <div class="detail-photo" ${photoBlockHtml(item, 'big')}>${item.photos && item.photos.length ? '' : photoStyle(item.id).icon}</div>
-    <div class="detail-price">${esc(priceText(item))}</div>
-    <div class="detail-title">${esc(titleOf(item))}</div>
-    <div class="detail-meta">${esc(locText(item))} · ${esc(item.type === 'daily' ? t('daily') : t('long'))}</div>
+    <div class="detail-photo" ${photoBlockHtml(item, 'big')}>
+      <span class="detail-photo-badge">${esc(item.type === 'daily' ? t('daily') : t('long'))}</span>
+      ${item.photos && item.photos.length ? '' : `<span class="photo-glyph">${photoStyle(item.id).icon}</span>`}
+    </div>
+    <div class="detail-head-row">
+      <div>
+        <div class="detail-price">${esc(priceText(item))}</div>
+        <div class="detail-title">${esc(titleOf(item))}</div>
+        <div class="detail-meta">${esc(locText(item))}</div>
+      </div>
+      <button type="button" class="icon-btn fav-btn${fav ? ' active' : ''}" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
+    </div>
 
     <div class="detail-grid">
       <div class="detail-cell"><b>${esc(item.rooms)}</b><span>${esc(t('rooms'))}</span></div>
@@ -507,13 +515,10 @@ function openDetail(id, fromHash) {
         <a class="btn btn-tg" href="${esc(telegramUrl(item))}" target="_blank" rel="noopener">✈️ ${esc(t('telegram'))}</a>
       </div>
       <div class="btn-row">
-        <a class="btn btn-secondary" href="${esc(googleMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onGoogleMap'))}</a>
-        <a class="btn btn-secondary" href="${esc(yandexMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onYandexMap'))}</a>
+        <a class="btn btn-outline" href="${esc(googleMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onGoogleMap'))}</a>
+        <a class="btn btn-outline" href="${esc(yandexMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onYandexMap'))}</a>
       </div>
-      <div class="btn-row">
-        <button type="button" class="btn btn-secondary" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
-        <button type="button" class="btn btn-secondary" data-action="share-listing" data-id="${esc(item.id)}">📤 ${esc(t('shareBtn'))}</button>
-      </div>
+      <button type="button" class="btn btn-outline btn-block" data-action="share-listing" data-id="${esc(item.id)}">📤 ${esc(t('shareBtn'))}</button>
     </div>
   `;
   qs('modal-detail').classList.add('open');

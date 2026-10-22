@@ -172,8 +172,13 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 
 .listing-photo {
   height: 132px; display: flex; align-items: center; justify-content: center;
-  font-size: 2.6rem; position: relative;
+  font-size: 2.6rem; position: relative; overflow: hidden;
 }
+.listing-photo::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 10px, rgba(255,255,255,0) 10px 20px);
+}
+.listing-photo span:not(.listing-badge):not(.listing-fav) { filter: drop-shadow(0 2px 6px rgba(0,0,0,.18)); position: relative; z-index: 1; }
 .listing-badge {
   position: absolute; top: 10px; left: 10px;
   background: rgba(255, 255, 255, .92); color: var(--brand);
@@ -210,15 +215,33 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 .btn {
   border: 0; border-radius: var(--r-btn);
   padding: 13px 18px; font-size: .95rem; font-weight: 600; cursor: pointer;
+  transition: transform .08s ease, box-shadow .15s ease, background .15s ease, border-color .15s ease;
 }
-.btn-primary { background: var(--brand); color: #fff; }
+.btn:active { transform: scale(.97); }
+.btn-primary { background: var(--brand); color: #fff; box-shadow: 0 4px 12px rgba(23,99,79,.28); }
 .btn-primary:hover { background: var(--brand-dark); }
 .btn-secondary { background: var(--muted-bg); color: var(--text); }
+.btn-outline {
+  background: #fff; color: var(--text); border: 1.5px solid var(--border);
+}
+.btn-outline:hover { border-color: var(--brand); color: var(--brand); background: var(--tile-active); }
 .btn-block { display: block; width: 100%; margin-top: 20px; }
 
 .btn-row { display: flex; gap: 10px; margin-top: 16px; }
 .btn-row .btn { flex: 1; text-align: center; text-decoration: none; line-height: 1.3; }
-.btn-tg { background: #229ED9; color: #fff; }
+.btn-tg { background: linear-gradient(135deg,#3db4f2,#229ED9); color: #fff; box-shadow: 0 4px 12px rgba(34,158,217,.32); }
+.btn-tg:hover { filter: brightness(1.06); }
+
+/* ---------- Tafsilot sarlavhasi (narx + sevimli tugma) ---------- */
+.detail-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.icon-btn {
+  flex: none; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--border);
+  background: #fff; font-size: 1.25rem; cursor: pointer; display: flex;
+  align-items: center; justify-content: center; line-height: 1;
+  transition: transform .08s ease, border-color .15s ease, background .15s ease;
+}
+.icon-btn:active { transform: scale(.92); }
+.fav-btn.active { border-color: #e0536b; background: #fdeef1; }
 
 /* ---------- Forma ---------- */
 #add-form label {
@@ -260,11 +283,21 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 
 /* ---------- Tafsilot ---------- */
 .detail-photo {
-  height: 170px; border-radius: var(--r-card);
+  height: 190px; border-radius: var(--r-card);
   display: flex; align-items: center; justify-content: center;
-  font-size: 3.4rem; margin-bottom: 16px;
+  margin-bottom: 16px; position: relative; overflow: hidden;
 }
-.detail-price { font-size: 1.4rem; font-weight: 800; color: var(--brand); }
+.detail-photo::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(135deg, rgba(255,255,255,.08) 0 10px, rgba(255,255,255,0) 10px 20px);
+}
+.photo-glyph { font-size: 3.6rem; filter: drop-shadow(0 3px 8px rgba(0,0,0,.18)); }
+.detail-photo-badge {
+  position: absolute; top: 12px; left: 12px; z-index: 1;
+  background: rgba(255,255,255,.92); color: var(--brand);
+  font-size: .72rem; font-weight: 700; padding: 5px 11px; border-radius: var(--r-pill);
+}
+.detail-price { font-size: 1.5rem; font-weight: 800; color: var(--brand); letter-spacing: -.01em; }
 .detail-title { font-size: 1.05rem; font-weight: 600; margin-top: 4px; }
 .detail-meta { font-size: .86rem; color: var(--text-2); margin-top: 6px; }
 
@@ -274,7 +307,7 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 }
 .detail-cell {
   background: var(--tile); border-radius: var(--r-tile);
-  padding: 11px 6px; text-align: center;
+  padding: 11px 6px; text-align: center; border: 1px solid rgba(23,99,79,.08);
 }
 .detail-cell b { display: block; font-size: .95rem; }
 .detail-cell span { font-size: .7rem; color: var(--text-2); }
