@@ -34,6 +34,7 @@ const I18N = {
     noSaved: "Saqlangan e'lon yo'q. Kartadagi ♡ ni bosing.",
     descTitle: 'Tavsif', contactTitle: "Bog'lanish",
     ownerTitle: "E'lon beruvchi", onMap: 'Xaritada ko‘rish',
+    onGoogleMap: '🗺️ Google xarita', onYandexMap: '🗺️ Yandex xarita',
     errTitle: 'Sarlavhani kiriting', errRegion: 'Hududni tanlang',
     errPrice: "Narxni kiriting", errPhone: 'Telefon raqamni kiriting',
     countSuffix: 'ta', floor: 'qavat', chooseRegion: 'Hududni tanlang',
@@ -100,6 +101,7 @@ const I18N = {
     noSaved: 'Нет сохранённых. Нажмите ♡ на карточке.',
     descTitle: 'Описание', contactTitle: 'Связаться',
     ownerTitle: 'Автор объявления', onMap: 'Показать на карте',
+    onGoogleMap: '🗺️ Google карта', onYandexMap: '🗺️ Яндекс карта',
     errTitle: 'Введите заголовок', errRegion: 'Выберите регион',
     errPrice: 'Введите цену', errPhone: 'Введите номер телефона',
     countSuffix: 'шт.', floor: 'этаж', chooseRegion: 'Выберите регион',
@@ -263,6 +265,18 @@ function coordsOf(item) {
   const r = regionById(item.region);
   return r ? [r.lat, r.lng] : [41.3, 69.25];
 }
+/* Telegram username berilgan bo'lsa shunga, bo'lmasa telefon raqami orqali
+   (bu raqam Telegram'ga ulangan bo'lsa chat ochiladi — username shart emas). */
+function telegramUrl(item) {
+  if (item.telegram) {
+    const handle = String(item.telegram).replace(/^@/, '').replace(/[^A-Za-z0-9_]/g, '');
+    return `https://t.me/${encodeURIComponent(handle)}`;
+  }
+  const digits = String(item.phone || '').replace(/\D/g, '');
+  return `https://t.me/+${digits}`;
+}
+function googleMapsUrl(lat, lng) { return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`; }
+function yandexMapsUrl(lat, lng) { return `https://yandex.com/maps/?pt=${lng},${lat}&z=16&l=map`; }
 function titleOf(item) { return item.title || ''; }
 function descOf(item) { return item.description || ''; }
 function priceText(item) {
@@ -489,15 +503,16 @@ function openDetail(id, fromHash) {
     <div class="detail-section">
       <h4>${esc(t('contactTitle'))}</h4>
       <div class="btn-row">
-        <a class="btn btn-primary" href="tel:${esc(String(item.phone).replace(/\s/g, ''))}">${esc(t('call'))}</a>
-        ${item.telegram ? `<a class="btn btn-tg" href="https://t.me/${esc(encodeURIComponent(String(item.telegram).replace(/^@/, '').replace(/[^A-Za-z0-9_]/g, '')))}" target="_blank" rel="noopener">${esc(t('telegram'))}</a>` : ''}
+        <a class="btn btn-primary" href="tel:${esc(String(item.phone).replace(/\s/g, ''))}">📞 ${esc(t('call'))}</a>
+        <a class="btn btn-tg" href="${esc(telegramUrl(item))}" target="_blank" rel="noopener">✈️ ${esc(t('telegram'))}</a>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn-secondary" href="${esc(googleMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onGoogleMap'))}</a>
+        <a class="btn btn-secondary" href="${esc(yandexMapsUrl(lat, lng))}" target="_blank" rel="noopener">${esc(t('onYandexMap'))}</a>
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-secondary" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
         <button type="button" class="btn btn-secondary" data-action="share-listing" data-id="${esc(item.id)}">📤 ${esc(t('shareBtn'))}</button>
-      </div>
-      <div class="btn-row">
-        <a class="btn btn-secondary" href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}" target="_blank" rel="noopener">${esc(t('onMap'))}</a>
       </div>
     </div>
   `;
