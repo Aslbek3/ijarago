@@ -48,6 +48,7 @@
 
       <div class="filters">
         <select id="f-region"></select>
+        <select id="f-district" hidden></select>
         <select id="f-rooms"></select>
         <select id="f-price"></select>
       </div>
@@ -92,6 +93,12 @@
         <label for="a-region" data-i18n="fRegion">Hudud</label>
         <select id="a-region"></select>
         <small class="field-error" id="err-a-region"></small>
+
+        <div id="a-district-wrap" hidden>
+          <label for="a-district" data-i18n="fDistrict">Tuman</label>
+          <select id="a-district"></select>
+          <small class="field-error" id="err-a-district"></small>
+        </div>
 
         <label for="a-type" data-i18n="fType">Ijara turi</label>
         <select id="a-type"></select>

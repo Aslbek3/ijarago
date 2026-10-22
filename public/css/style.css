@@ -144,9 +144,9 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 .tabs button.active { border-color: var(--brand); background: var(--tile-active); font-weight: 600; color: var(--brand); }
 
 /* ---------- Filtrlar ---------- */
-.filters { display: flex; gap: 8px; margin-bottom: 20px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
 .filters select {
-  flex: 1; min-width: 0;
+  flex: 1 1 30%; min-width: 0;
   border: 1px solid var(--border); border-radius: var(--r-btn);
   padding: 10px 8px; font-size: .82rem; background: #fff; color: var(--text); outline: none;
 }

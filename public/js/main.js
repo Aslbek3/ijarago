@@ -34,6 +34,7 @@ const I18N = {
     errTitle: 'Sarlavhani kiriting', errRegion: 'Hududni tanlang',
     errPrice: "Narxni kiriting", errPhone: 'Telefon raqamni kiriting',
     countSuffix: 'ta', floor: 'qavat', chooseRegion: 'Hududni tanlang',
+    fDistrict: 'Tuman', allDistricts: 'Barcha tumanlar', chooseDistrict: 'Tumanni tanlang', errDistrict: 'Tumanni tanlang',
     mapOffline: "Xarita yuklanmadi. Internet aloqasini tekshiring.",
   },
   ru: {
@@ -67,20 +68,48 @@ const I18N = {
     errTitle: 'Введите заголовок', errRegion: 'Выберите регион',
     errPrice: 'Введите цену', errPhone: 'Введите номер телефона',
     countSuffix: 'шт.', floor: 'этаж', chooseRegion: 'Выберите регион',
+    fDistrict: 'Район', allDistricts: 'Все районы', chooseDistrict: 'Выберите район', errDistrict: 'Выберите район',
     mapOffline: 'Карта не загрузилась. Проверьте подключение к интернету.',
   },
 };
 
+/* O'zbekistonning 14 ta hududi. Koordinatalar - hudud markazi (taxminiy). */
 const REGIONS = [
-  { key: 'toshkent-sh', uz: 'Toshkent shahri', ru: 'город Ташкент', lat: 41.311, lng: 69.280 },
-  { key: 'toshkent-v',  uz: 'Toshkent viloyati', ru: 'Ташкентская обл.', lat: 41.000, lng: 69.600 },
-  { key: 'samarqand',   uz: 'Samarqand', ru: 'Самарканд', lat: 39.654, lng: 66.959 },
-  { key: 'buxoro',      uz: 'Buxoro', ru: 'Бухара', lat: 39.767, lng: 64.423 },
-  { key: 'andijon',     uz: 'Andijon', ru: 'Андижан', lat: 40.783, lng: 72.350 },
-  { key: 'fargona',     uz: "Farg'ona", ru: 'Фергана', lat: 40.389, lng: 71.783 },
-  { key: 'namangan',    uz: 'Namangan', ru: 'Наманган', lat: 40.998, lng: 71.672 },
-  { key: 'xorazm',      uz: 'Xorazm', ru: 'Хорезм', lat: 41.550, lng: 60.631 },
+  { key: 'toshkent-sh',     uz: 'Toshkent shahri', ru: 'город Ташкент', lat: 41.311, lng: 69.280 },
+  { key: 'toshkent-v',      uz: 'Toshkent viloyati', ru: 'Ташкентская обл.', lat: 41.000, lng: 69.600 },
+  { key: 'andijon',         uz: 'Andijon', ru: 'Андижан', lat: 40.783, lng: 72.350 },
+  { key: 'buxoro',          uz: 'Buxoro', ru: 'Бухара', lat: 39.767, lng: 64.423 },
+  { key: 'fargona',         uz: "Farg'ona", ru: 'Фергана', lat: 40.389, lng: 71.783 },
+  { key: 'jizzax',          uz: 'Jizzax', ru: 'Джизак', lat: 40.116, lng: 67.842 },
+  { key: 'xorazm',          uz: 'Xorazm', ru: 'Хорезм', lat: 41.550, lng: 60.631 },
+  { key: 'namangan',        uz: 'Namangan', ru: 'Наманган', lat: 40.998, lng: 71.672 },
+  { key: 'navoiy',          uz: 'Navoiy', ru: 'Навои', lat: 40.103, lng: 65.374 },
+  { key: 'qashqadaryo',     uz: 'Qashqadaryo', ru: 'Кашкадарья', lat: 38.861, lng: 65.789 },
+  { key: 'qoraqalpogiston', uz: "Qoraqalpog'iston", ru: 'Каракалпакстан', lat: 42.460, lng: 59.600 },
+  { key: 'samarqand',       uz: 'Samarqand', ru: 'Самарканд', lat: 39.654, lng: 66.959 },
+  { key: 'sirdaryo',        uz: 'Sirdaryo', ru: 'Сырдарья', lat: 40.489, lng: 68.784 },
+  { key: 'surxondaryo',     uz: 'Surxondaryo', ru: 'Сурхандарья', lat: 37.224, lng: 67.278 },
 ];
+
+/* Tumanlar. Hozircha faqat Toshkent shahri (12 ta tuman); boshqa hududlar
+   rasmiy royxatdan toldiriladi. Koordinatalar taxminiy - xaritada belgi
+   tuman ichida turishi uchun, aniq manzil uchun emas. */
+const DISTRICTS = {
+  'toshkent-sh': [
+    { key: 'bektemir',      uz: 'Bektemir',        ru: 'Бектемир',      lat: 41.210, lng: 69.335 },
+    { key: 'chilonzor',     uz: 'Chilonzor',       ru: 'Чиланзар',      lat: 41.275, lng: 69.204 },
+    { key: 'yashnobod',     uz: 'Yashnobod',       ru: 'Яшнабад',       lat: 41.295, lng: 69.330 },
+    { key: 'yakkasaroy',    uz: 'Yakkasaroy',      ru: 'Яккасарай',     lat: 41.290, lng: 69.260 },
+    { key: 'mirobod',       uz: 'Mirobod',         ru: 'Мирабад',       lat: 41.285, lng: 69.285 },
+    { key: 'mirzo-ulugbek', uz: "Mirzo Ulug'bek",  ru: 'Мирзо-Улугбек', lat: 41.340, lng: 69.330 },
+    { key: 'olmazor',       uz: 'Olmazor',         ru: 'Алмазар',       lat: 41.345, lng: 69.230 },
+    { key: 'sergeli',       uz: 'Sergeli',         ru: 'Сергели',       lat: 41.225, lng: 69.220 },
+    { key: 'uchtepa',       uz: 'Uchtepa',         ru: 'Учтепа',        lat: 41.300, lng: 69.180 },
+    { key: 'shayxontohur',  uz: 'Shayxontohur',    ru: 'Шайхантахур',   lat: 41.325, lng: 69.250 },
+    { key: 'yunusobod',     uz: 'Yunusobod',       ru: 'Юнусабад',      lat: 41.367, lng: 69.289 },
+    { key: 'yangihayot',    uz: 'Yangihayot',      ru: 'Янгихаёт',      lat: 41.275, lng: 69.130 },
+  ],
+};
 
 const PHOTO_STYLES = [
   'linear-gradient(135deg,#1f8064,#17634f)',
@@ -94,8 +123,8 @@ const PHOTO_ICONS = ['🏢', '🏠', '🏡', '🌇', '🪟', '🛋️'];
 
 /* ---------- Demo e'lonlar ---------- */
 const DEMO = [
-  { id: 'd1', title: { uz: '2 xonali kvartira, Chilonzor', ru: '2-комн. квартира, Чиланзар' }, region: 'toshkent-sh', type: 'long', rooms: 2, price: 4500000, floor: '5/9', area: 54, phone: '+998901234567', tg: 'ijarago_demo', lat: 41.275, lng: 69.204, desc: { uz: "Metro yaqinida, ta'mirlangan, mebel va texnika bilan.", ru: 'Рядом метро, с ремонтом, мебель и техника.' } },
-  { id: 'd2', title: { uz: 'Lyuks studiya, Yunusobod', ru: 'Люкс-студия, Юнусабад' }, region: 'toshkent-sh', type: 'daily', rooms: 1, price: 350000, floor: '7/12', area: 38, phone: '+998902345678', tg: 'ijarago_demo', lat: 41.367, lng: 69.289, desc: { uz: 'Kunlik ijara, yangi bino, konditsioner va Wi-Fi.', ru: 'Посуточно, новый дом, кондиционер и Wi-Fi.' } },
+  { id: 'd1', title: { uz: '2 xonali kvartira, Chilonzor', ru: '2-комн. квартира, Чиланзар' }, region: 'toshkent-sh', district: 'chilonzor', type: 'long', rooms: 2, price: 4500000, floor: '5/9', area: 54, phone: '+998901234567', tg: 'ijarago_demo', lat: 41.275, lng: 69.204, desc: { uz: "Metro yaqinida, ta'mirlangan, mebel va texnika bilan.", ru: 'Рядом метро, с ремонтом, мебель и техника.' } },
+  { id: 'd2', title: { uz: 'Lyuks studiya, Yunusobod', ru: 'Люкс-студия, Юнусабад' }, region: 'toshkent-sh', district: 'yunusobod', type: 'daily', rooms: 1, price: 350000, floor: '7/12', area: 38, phone: '+998902345678', tg: 'ijarago_demo', lat: 41.367, lng: 69.289, desc: { uz: 'Kunlik ijara, yangi bino, konditsioner va Wi-Fi.', ru: 'Посуточно, новый дом, кондиционер и Wi-Fi.' } },
   { id: 'd3', title: { uz: '3 xonali uy, Registon yaqinida', ru: '3-комн. дом, рядом с Регистаном' }, region: 'samarqand', type: 'daily', rooms: 3, price: 600000, floor: '1/1', area: 90, phone: '+998903456789', tg: '', lat: 39.655, lng: 66.975, desc: { uz: 'Sayyohlar uchun qulay, hovli bor, markazga piyoda.', ru: 'Удобно туристам, есть двор, до центра пешком.' } },
   { id: 'd4', title: { uz: '1 xonali kvartira, Buxoro markazi', ru: '1-комн. квартира, центр Бухары' }, region: 'buxoro', type: 'long', rooms: 1, price: 2200000, floor: '3/5', area: 40, phone: '+998904567890', tg: 'ijarago_demo', lat: 39.774, lng: 64.428, desc: { uz: 'Markazda, do‘kon va bozor yaqin, uzoq muddatga.', ru: 'В центре, рядом магазины и базар, на длительный срок.' } },
   { id: 'd5', title: { uz: '4 xonali kottej, Toshkent viloyati', ru: '4-комн. коттедж, Ташкентская обл.' }, region: 'toshkent-v', type: 'daily', rooms: 4, price: 1200000, floor: '2/2', area: 160, phone: '+998905678901', tg: 'ijarago_demo', lat: 41.100, lng: 69.700, desc: { uz: 'Dam olish uchun, basseyn va katta hovli.', ru: 'Для отдыха, бассейн и большой двор.' } },
@@ -113,6 +142,7 @@ const state = {
   lang: 'uz',
   type: 'all',
   region: '',
+  district: '',
   rooms: '',
   price: '',
   query: '',
@@ -152,6 +182,21 @@ function regionById(key) { return REGIONS.find((r) => r.key === key); }
 function regionName(key) {
   const r = regionById(key);
   return r ? r[state.lang] : key;
+}
+function districtsOf(regionKey) { return DISTRICTS[regionKey] || []; }
+function districtById(regionKey, key) { return districtsOf(regionKey).find((d) => d.key === key); }
+/* "Chilonzor, Toshkent shahri" yoki tuman bolmasa faqat hudud */
+function locText(item) {
+  const d = item.district ? districtById(item.region, item.district) : null;
+  return d ? d[state.lang] + ', ' + regionName(item.region) : regionName(item.region);
+}
+/* Aniq nuqta > tuman markazi > hudud markazi > Ozbekiston markazi */
+function coordsOf(item) {
+  if (item.lat && item.lng) return [item.lat, item.lng];
+  const d = item.district ? districtById(item.region, item.district) : null;
+  if (d) return [d.lat, d.lng];
+  const r = regionById(item.region);
+  return r ? [r.lat, r.lng] : [41.3, 69.25];
 }
 function titleOf(item) {
   return typeof item.title === 'string' ? item.title : (item.title[state.lang] || item.title.uz);
@@ -208,6 +253,11 @@ function buildFilters() {
   qs('f-region').innerHTML = `<option value="">${esc(t('allRegions'))}</option>` +
     REGIONS.map((r) => `<option value="${esc(r.key)}"${state.region === r.key ? ' selected' : ''}>${esc(r[state.lang])}</option>`).join('');
 
+  const ds = districtsOf(state.region);
+  qs('f-district').hidden = ds.length === 0;
+  qs('f-district').innerHTML = `<option value="">${esc(t('allDistricts'))}</option>` +
+    ds.map((d) => `<option value="${esc(d.key)}"${state.district === d.key ? ' selected' : ''}>${esc(d[state.lang])}</option>`).join('');
+
   qs('f-rooms').innerHTML = `<option value="">${esc(t('anyRooms'))}</option>` +
     [1, 2, 3, 4].map((n) => `<option value="${n}"${String(state.rooms) === String(n) ? ' selected' : ''}>${n}+ ${esc(t('rooms'))}</option>`).join('');
 
@@ -217,11 +267,28 @@ function buildFilters() {
 }
 
 function buildAddSelects() {
+  /* Til almashtirilganda forma bosh qolmasligi uchun tanlovlarni saqlab turamiz */
+  const keep = { region: qs('a-region').value, type: qs('a-type').value, rooms: qs('a-rooms').value, district: qs('a-district').value };
+
   qs('a-region').innerHTML = `<option value="">${esc(t('chooseRegion'))}</option>` +
     REGIONS.map((r) => `<option value="${esc(r.key)}">${esc(r[state.lang])}</option>`).join('');
   qs('a-type').innerHTML =
     `<option value="long">${esc(t('long'))}</option><option value="daily">${esc(t('daily'))}</option>`;
   qs('a-rooms').innerHTML = [1, 2, 3, 4, 5].map((n) => `<option value="${n}">${n} ${esc(t('rooms'))}</option>`).join('');
+
+  if (keep.region) qs('a-region').value = keep.region;
+  if (keep.type) qs('a-type').value = keep.type;
+  if (keep.rooms) qs('a-rooms').value = keep.rooms;
+  buildAddDistricts(keep.district);
+}
+
+/* Tanlangan hududda tumanlar bolsagina tuman maydoni korinadi */
+function buildAddDistricts(selected) {
+  const ds = districtsOf(qs('a-region').value);
+  qs('a-district-wrap').hidden = ds.length === 0;
+  qs('a-district').innerHTML = `<option value="">${esc(t('chooseDistrict'))}</option>` +
+    ds.map((d) => `<option value="${esc(d.key)}">${esc(d[state.lang])}</option>`).join('');
+  if (selected && ds.some((d) => d.key === selected)) qs('a-district').value = selected;
 }
 
 /* ---------- Filtrlash ---------- */
@@ -230,12 +297,13 @@ function filtered() {
   return allListings().filter((item) => {
     if (state.type !== 'all' && item.type !== state.type) return false;
     if (state.region && item.region !== state.region) return false;
+    if (state.district && item.district !== state.district) return false;
     if (state.rooms && Number(item.rooms) < Number(state.rooms)) return false;
     if (state.price === 'lo' && item.price >= 500000) return false;
     if (state.price === 'mid' && (item.price < 500000 || item.price > 3000000)) return false;
     if (state.price === 'hi' && item.price <= 3000000) return false;
     if (q) {
-      const hay = (titleOf(item) + ' ' + regionName(item.region)).toLowerCase();
+      const hay = (titleOf(item) + ' ' + locText(item)).toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -256,7 +324,7 @@ function cardHtml(item) {
       <div class="listing-body">
         <div class="listing-price">${esc(priceText(item))}</div>
         <div class="listing-title">${esc(titleOf(item))}</div>
-        <div class="listing-meta">${esc(regionName(item.region))} · ${esc(item.rooms)} ${esc(t('rooms'))} · ${esc(item.area)} m²</div>
+        <div class="listing-meta">${esc(locText(item))} · ${esc(item.rooms)} ${esc(t('rooms'))} · ${esc(item.area)} m²</div>
       </div>
     </article>
   `;
@@ -303,9 +371,7 @@ function renderMap() {
 
   const list = filtered();
   list.forEach((item) => {
-    const r = regionById(item.region);
-    const lat = item.lat || (r && r.lat) || 41.3;
-    const lng = item.lng || (r && r.lng) || 69.25;
+    const [lat, lng] = coordsOf(item);
     L.marker([lat, lng]).addTo(markerLayer)
       .bindPopup(`<b>${esc(titleOf(item))}</b><br>${esc(priceText(item))}`)
       .on('click', () => openDetail(item.id));
@@ -320,16 +386,14 @@ function openDetail(id) {
   const item = allListings().find((x) => x.id === id);
   if (!item) return;
   const p = photoStyle(item.id);
-  const r = regionById(item.region);
-  const lat = item.lat || (r && r.lat) || 41.3;
-  const lng = item.lng || (r && r.lng) || 69.25;
+  const [lat, lng] = coordsOf(item);
   const fav = getSaved().includes(item.id);
 
   qs('detail-content').innerHTML = `
     <div class="detail-photo" style="background:${p.bg}">${p.icon}</div>
     <div class="detail-price">${esc(priceText(item))}</div>
     <div class="detail-title">${esc(titleOf(item))}</div>
-    <div class="detail-meta">${esc(regionName(item.region))} · ${esc(item.type === 'daily' ? t('daily') : t('long'))}</div>
+    <div class="detail-meta">${esc(locText(item))} · ${esc(item.type === 'daily' ? t('daily') : t('long'))}</div>
 
     <div class="detail-grid">
       <div class="detail-cell"><b>${esc(item.rooms)}</b><span>${esc(t('rooms'))}</span></div>
@@ -388,21 +452,26 @@ function setErr(id, msg) {
 function handleAdd(e) {
   e.preventDefault();
   let ok = true;
-  ['a-title', 'a-region', 'a-price', 'a-phone'].forEach((id) => setErr(id, ''));
+  ['a-title', 'a-region', 'a-district', 'a-price', 'a-phone'].forEach((id) => setErr(id, ''));
 
   if (!qs('a-title').value.trim()) { setErr('a-title', t('errTitle')); ok = false; }
   if (!qs('a-region').value) { setErr('a-region', t('errRegion')); ok = false; }
+  if (districtsOf(qs('a-region').value).length && !qs('a-district').value) { setErr('a-district', t('errDistrict')); ok = false; }
   if (!qs('a-price').value || Number(qs('a-price').value) <= 0) { setErr('a-price', t('errPrice')); ok = false; }
   const phone = qs('a-phone').value.trim();
   if (phone.replace(/\D/g, '').length < 9) { setErr('a-phone', t('errPhone')); ok = false; }
   if (!ok) return;
 
-  const r = regionById(qs('a-region').value);
+  const regionKey = qs('a-region').value;
+  const districtKey = districtsOf(regionKey).length ? qs('a-district').value : '';
+  const base = coordsOf({ region: regionKey, district: districtKey });
+  const spread = districtKey ? 0.008 : 0.04;
   const mine = getMine();
   mine.unshift({
     id: 'm' + Date.now(),
     title: qs('a-title').value.trim(),
-    region: qs('a-region').value,
+    region: regionKey,
+    district: districtKey,
     type: qs('a-type').value,
     rooms: Number(qs('a-rooms').value),
     price: Number(qs('a-price').value),
@@ -411,13 +480,14 @@ function handleAdd(e) {
     phone: phone,
     tg: qs('a-tg').value.trim().replace('@', ''),
     desc: qs('a-desc').value.trim(),
-    lat: r ? r.lat + (Math.random() - 0.5) * 0.04 : 41.3,
-    lng: r ? r.lng + (Math.random() - 0.5) * 0.04 : 69.25,
+    lat: base[0] + (Math.random() - 0.5) * spread,
+    lng: base[1] + (Math.random() - 0.5) * spread,
   });
   writeJson(MINE_KEY, mine);
   qs('add-form').reset();
+  buildAddDistricts('');
   showToast(t('published'));
-  state.type = 'all'; state.region = ''; state.rooms = ''; state.price = ''; state.query = '';
+  state.type = 'all'; state.region = ''; state.district = ''; state.rooms = ''; state.price = ''; state.query = '';
   buildTabs(); buildFilters();
   renderAll();
   showView('home');
@@ -442,7 +512,13 @@ function init() {
     renderAll();
   });
 
-  qs('f-region').addEventListener('change', (e) => { state.region = e.target.value; renderAll(); });
+  qs('f-region').addEventListener('change', (e) => {
+    state.region = e.target.value;
+    state.district = '';          /* hudud o'zgarsa tuman tanlovi tushadi */
+    buildFilters();
+    renderAll();
+  });
+  qs('f-district').addEventListener('change', (e) => { state.district = e.target.value; renderAll(); });
   qs('f-rooms').addEventListener('change', (e) => { state.rooms = e.target.value; renderAll(); });
   qs('f-price').addEventListener('change', (e) => { state.price = e.target.value; renderAll(); });
 
@@ -454,7 +530,8 @@ function init() {
   });
 
   qs('add-form').addEventListener('submit', handleAdd);
-  ['a-title', 'a-region', 'a-price', 'a-phone'].forEach((id) => {
+  qs('a-region').addEventListener('change', () => buildAddDistricts(''));
+  ['a-title', 'a-region', 'a-district', 'a-price', 'a-phone'].forEach((id) => {
     qs(id).addEventListener('input', () => setErr(id, ''));
     qs(id).addEventListener('change', () => setErr(id, ''));
   });
