@@ -33,6 +33,8 @@ const I18N = {
     ownerTitle: "E'lon beruvchi", onMap: 'Xaritada ko‘rish',
     errTitle: 'Sarlavhani kiriting', errRegion: 'Hududni tanlang',
     errPrice: "Narxni kiriting", errPhone: 'Telefon raqamni kiriting',
+    countSuffix: 'ta', floor: 'qavat', chooseRegion: 'Hududni tanlang',
+    mapOffline: "Xarita yuklanmadi. Internet aloqasini tekshiring.",
   },
   ru: {
     tagline: 'Найти жильё просто',
@@ -64,6 +66,8 @@ const I18N = {
     ownerTitle: 'Автор объявления', onMap: 'Показать на карте',
     errTitle: 'Введите заголовок', errRegion: 'Выберите регион',
     errPrice: 'Введите цену', errPhone: 'Введите номер телефона',
+    countSuffix: 'шт.', floor: 'этаж', chooseRegion: 'Выберите регион',
+    mapOffline: 'Карта не загрузилась. Проверьте подключение к интернету.',
   },
 };
 
@@ -213,7 +217,7 @@ function buildFilters() {
 }
 
 function buildAddSelects() {
-  qs('a-region').innerHTML = `<option value="">${esc(t('allRegions'))}</option>` +
+  qs('a-region').innerHTML = `<option value="">${esc(t('chooseRegion'))}</option>` +
     REGIONS.map((r) => `<option value="${esc(r.key)}">${esc(r[state.lang])}</option>`).join('');
   qs('a-type').innerHTML =
     `<option value="long">${esc(t('long'))}</option><option value="daily">${esc(t('daily'))}</option>`;
@@ -263,7 +267,7 @@ function renderHome() {
   qs('listing-list').innerHTML = list.length
     ? list.map(cardHtml).join('')
     : `<div class="empty-state">${esc(t('noResults'))}</div>`;
-  qs('home-count').textContent = list.length + ' ta';
+  qs('home-count').textContent = list.length + ' ' + t('countSuffix');
 }
 
 function renderSaved() {
@@ -272,7 +276,7 @@ function renderSaved() {
   qs('saved-list').innerHTML = list.length
     ? list.map(cardHtml).join('')
     : `<div class="empty-state">${esc(t('noSaved'))}</div>`;
-  qs('saved-count').textContent = list.length + ' ta';
+  qs('saved-count').textContent = list.length + ' ' + t('countSuffix');
 }
 
 function renderAll() {
@@ -283,7 +287,10 @@ function renderAll() {
 
 /* ---------- Xarita ---------- */
 function renderMap() {
-  if (typeof L === 'undefined') return;             /* Leaflet yuklanmagan (internet yo'q) */
+  if (typeof L === 'undefined') {                   /* Leaflet yuklanmagan (internet yo'q) */
+    qs('map').innerHTML = `<div class="empty-state">${esc(t('mapOffline'))}</div>`;
+    return;
+  }
   if (!map) {
     map = L.map('map').setView([41.3, 69.25], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -304,7 +311,7 @@ function renderMap() {
       .on('click', () => openDetail(item.id));
   });
 
-  qs('map-count').textContent = list.length + ' ta';
+  qs('map-count').textContent = list.length + ' ' + t('countSuffix');
   setTimeout(() => map.invalidateSize(), 50);
 }
 
@@ -327,7 +334,7 @@ function openDetail(id) {
     <div class="detail-grid">
       <div class="detail-cell"><b>${esc(item.rooms)}</b><span>${esc(t('rooms'))}</span></div>
       <div class="detail-cell"><b>${esc(item.area)}</b><span>m²</span></div>
-      <div class="detail-cell"><b>${esc(item.floor || '—')}</b><span>qavat</span></div>
+      <div class="detail-cell"><b>${esc(item.floor || '—')}</b><span>${esc(t('floor'))}</span></div>
     </div>
 
     ${descOf(item) ? `<div class="detail-section"><h4>${esc(t('descTitle'))}</h4><p>${esc(descOf(item))}</p></div>` : ''}
@@ -336,7 +343,7 @@ function openDetail(id) {
       <h4>${esc(t('contactTitle'))}</h4>
       <div class="btn-row">
         <a class="btn btn-primary" href="tel:${esc(String(item.phone).replace(/\s/g, ''))}">${esc(t('call'))}</a>
-        ${item.tg ? `<a class="btn btn-tg" href="https://t.me/${esc(String(item.tg).replace('@', ''))}" target="_blank" rel="noopener">${esc(t('telegram'))}</a>` : ''}
+        ${item.tg ? `<a class="btn btn-tg" href="https://t.me/${esc(encodeURIComponent(String(item.tg).replace(/^@/, '').replace(/[^A-Za-z0-9_]/g, '')))}" target="_blank" rel="noopener">${esc(t('telegram'))}</a>` : ''}
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-secondary" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
