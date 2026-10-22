@@ -188,6 +188,16 @@ const Api = (() => {
     });
   }
 
+  /* Egasi o'z e'lonini tahrirlashi — rasmlarga tegmaydi, faqat matn/raqam
+     maydonlari. Hook buni serverda avtomatik "pending"ga qaytaradi. */
+  async function updateListing(id, fields) {
+    const session = getUserSession();
+    if (!session) throw new Error('Avval akkauntga kiring');
+    return request(`/api/collections/listings/records/${id}`, {
+      method: 'PATCH', body: fields, token: session.token,
+    });
+  }
+
   async function deleteListing(id) {
     const session = getUserSession();
     const admin = getAdminSession();
@@ -205,6 +215,6 @@ const Api = (() => {
     currentUser, getUserSession, authenticateAccount, logoutUser,
     isAdminUnlocked, adminLogin, adminLogout,
     listApproved, listMine, listAllForAdmin, getListing,
-    createListing, updateListingStatus, deleteListing, photoUrl,
+    createListing, updateListing, updateListingStatus, deleteListing, photoUrl,
   };
 })();

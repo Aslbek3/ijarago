@@ -56,6 +56,11 @@ const I18N = {
     deleteListing: "E'lonni o'chirish", deleteConfirm: "E'lonni o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
     deleted: "E'lon o'chirildi",
     goToAdmin: '⚙ Boshqaruv paneli',
+    editListing: 'Tahrirlash', editSave: 'Yangilash', editTitle: "E'lonni tahrirlash",
+    editSaved: "E'lon yangilandi — qayta moderatsiyaga yuborildi",
+    nearMe: 'Yaqin atrofimda', nearMeOk: ' tanlandi (eng yaqin hudud)',
+    nearMeFail: 'Joylashuvga ruxsat berilmadi', nearMeUnsupported: 'Brauzer joylashuvni qo‘llamaydi',
+    shareBtn: 'Ulashish', linkCopied: 'Havola nusxalandi', shareNotFound: "E'lon topilmadi",
 
     adminTitle: 'Boshqaruv paneli', adminExit: 'Chiqish',
     pinNote: 'Davom etish uchun admin parolni kiriting.', pinWrong: "Parol noto'g'ri",
@@ -117,6 +122,11 @@ const I18N = {
     deleteListing: 'Удалить объявление', deleteConfirm: 'Удалить объявление? Это действие нельзя отменить.',
     deleted: 'Объявление удалено',
     goToAdmin: '⚙ Панель управления',
+    editListing: 'Редактировать', editSave: 'Обновить', editTitle: 'Редактирование объявления',
+    editSaved: 'Объявление обновлено — отправлено на повторную проверку',
+    nearMe: 'Рядом со мной', nearMeOk: ' выбран (ближайший регион)',
+    nearMeFail: 'Доступ к геолокации не разрешён', nearMeUnsupported: 'Браузер не поддерживает геолокацию',
+    shareBtn: 'Поделиться', linkCopied: 'Ссылка скопирована', shareNotFound: 'Объявление не найдено',
 
     adminTitle: 'Панель управления', adminExit: 'Выход',
     pinNote: 'Введите пароль администратора.', pinWrong: 'Неверный пароль',
@@ -193,9 +203,11 @@ const state = {
   query: '',
   view: 'home',
   authRole: 'owner',
+  editingId: null,
 };
 
 let listingsCache = [];
+let myListingsCache = [];
 let map = null;
 let markerLayer = null;
 let toastTimer = null;
@@ -451,9 +463,12 @@ function renderMap() {
 }
 
 /* ---------- Tafsilot ---------- */
-function openDetail(id) {
+function openDetail(id, fromHash) {
   const item = listingsCache.find((x) => x.id === id);
-  if (!item) return;
+  if (!item) {
+    if (fromHash) showToast(t('shareNotFound'));
+    return;
+  }
   const [lat, lng] = coordsOf(item);
   const fav = getSaved().includes(item.id);
 
@@ -479,11 +494,72 @@ function openDetail(id) {
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-secondary" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
+        <button type="button" class="btn btn-secondary" data-action="share-listing" data-id="${esc(item.id)}">📤 ${esc(t('shareBtn'))}</button>
+      </div>
+      <div class="btn-row">
         <a class="btn btn-secondary" href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=16/${lat}/${lng}" target="_blank" rel="noopener">${esc(t('onMap'))}</a>
       </div>
     </div>
   `;
   qs('modal-detail').classList.add('open');
+  if (!fromHash && location.hash !== '#/listing/' + id) {
+    history.pushState(null, '', '#/listing/' + id);
+  }
+}
+
+function closeDetailModal() {
+  closeModal(qs('modal-detail'));
+  if (location.hash.startsWith('#/listing/')) {
+    history.pushState(null, '', location.pathname + location.search);
+  }
+}
+
+async function shareListing(id) {
+  const item = listingsCache.find((x) => x.id === id);
+  if (!item) return;
+  const url = location.origin + location.pathname + '#/listing/' + id;
+  if (navigator.share) {
+    try { await navigator.share({ title: titleOf(item), text: priceText(item), url }); }
+    catch (e) { /* foydalanuvchi bekor qildi — xato emas */ }
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast(t('linkCopied'));
+  } catch (e) {
+    showToast(url);
+  }
+}
+
+/* ---------- Joylashuv (Yaqin atrofimda) ---------- */
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function findNearMe() {
+  if (!navigator.geolocation) { showToast(t('nearMeUnsupported')); return; }
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      let nearest = null, best = Infinity;
+      REGIONS.forEach((r) => {
+        const d = haversineKm(latitude, longitude, r.lat, r.lng);
+        if (d < best) { best = d; nearest = r; }
+      });
+      if (!nearest) return;
+      state.region = nearest.key;
+      state.district = '';
+      buildFilters();
+      renderAll();
+      showToast(nearest[state.lang] + t('nearMeOk'));
+    },
+    () => showToast(t('nearMeFail')),
+    { timeout: 8000 },
+  );
 }
 
 /* ---------- Saqlash ---------- */
@@ -623,6 +699,7 @@ async function renderProfile() {
   mineBox.innerHTML = `<p class="muted">...</p>`;
   try {
     const mine = await Api.listMine();
+    myListingsCache = mine;
     mineBox.innerHTML = mine.length ? mine.map((item) => `
       <div class="admin-listing-card">
         <div class="admin-listing-top">
@@ -631,6 +708,7 @@ async function renderProfile() {
         </div>
         <div class="admin-listing-meta">${esc(locText(item))} · ${esc(priceText(item))}</div>
         ${item.note ? `<div class="admin-listing-meta">${esc(item.note)}</div>` : ''}
+        <button type="button" class="edit-btn" data-action="edit-listing" data-id="${esc(item.id)}">${esc(t('editListing'))}</button>
         <button type="button" class="remove-btn" data-action="delete-listing" data-id="${esc(item.id)}">${esc(t('deleteListing'))}</button>
       </div>
     `).join('') : `<p class="muted">${esc(t('noMyListings'))}</p>`;
@@ -705,6 +783,7 @@ async function renderAdmin() {
         <span class="badge badge-${esc(item.status)}">${esc(t(STATUS_LABEL_KEY[item.status] || 'statusPending'))}</span>
       </div>
       <div class="admin-listing-meta">${esc(locText(item))} · ${esc(priceText(item))} · ${esc(item.phone)}</div>
+      <textarea class="admin-note-input" data-id="${esc(item.id)}" placeholder="Izoh (ixtiyoriy, rad etishda ko'rsatiladi)">${esc(item.note || '')}</textarea>
       <div class="admin-listing-actions">
         <button type="button" class="btn btn-primary" data-action="approve-listing" data-id="${esc(item.id)}">${esc(t('adminApprove'))}</button>
         <button type="button" class="btn btn-danger" data-action="reject-listing" data-id="${esc(item.id)}">${esc(t('adminReject'))}</button>
@@ -713,9 +792,9 @@ async function renderAdmin() {
   `).join('') : `<div class="empty-state">${esc(t('adminEmpty'))}</div>`;
 }
 
-async function setListingStatus(id, status) {
+async function setListingStatus(id, status, note) {
   try {
-    await Api.updateListingStatus(id, status);
+    await Api.updateListingStatus(id, status, note);
     renderAdmin();
     await loadListings();
     renderAll();
@@ -733,6 +812,38 @@ function renderPhotoPreview() {
     img.src = URL.createObjectURL(file);
     box.appendChild(img);
   });
+}
+
+function resetAddForm() {
+  state.editingId = null;
+  qs('add-form').reset();
+  selectedPhotoFiles = [];
+  renderPhotoPreview();
+  buildAddDistricts('');
+  qs('add-form').querySelector('button[type="submit"]').textContent = t('publish');
+  qs('a-photos-wrap').hidden = false;
+}
+
+/* "Mening e'lonlarim"dan "Tahrirlash" bosilganda formani to'ldirib, tahrirlash rejimiga o'tadi.
+   Rasmlar tahrirlanmaydi (mavjudlari saqlanib qoladi) — shuning uchun rasm maydoni shu rejimda yashiriladi. */
+function startEditListing(item) {
+  state.editingId = item.id;
+  qs('a-title').value = titleOf(item);
+  qs('a-region').value = item.region;
+  buildAddDistricts(item.district || '');
+  qs('a-type').value = item.type;
+  qs('a-rooms').value = item.rooms;
+  qs('a-area').value = item.area || '';
+  qs('a-floor').value = item.floor || '';
+  qs('a-price').value = item.price;
+  qs('a-phone').value = item.phone;
+  qs('a-tg').value = item.telegram || '';
+  qs('a-desc').value = descOf(item);
+  selectedPhotoFiles = [];
+  renderPhotoPreview();
+  qs('a-photos-wrap').hidden = true;
+  qs('add-form').querySelector('button[type="submit"]').textContent = t('editSave');
+  showView('add');
 }
 
 async function handleAdd(e) {
@@ -760,30 +871,33 @@ async function handleAdd(e) {
   const base = coordsOf({ region: regionKey, district: districtKey });
   const spread = districtKey ? 0.008 : 0.04;
 
+  const fields = {
+    title: qs('a-title').value.trim(),
+    description: qs('a-desc').value.trim(),
+    region: regionKey,
+    district: districtKey,
+    type: qs('a-type').value,
+    rooms: Number(qs('a-rooms').value),
+    area: Number(qs('a-area').value) || 0,
+    floor: qs('a-floor').value.trim(),
+    price: Number(qs('a-price').value),
+    phone: phone,
+    telegram: qs('a-tg').value.trim().replace('@', ''),
+    lat: base[0] + (Math.random() - 0.5) * spread,
+    lng: base[1] + (Math.random() - 0.5) * spread,
+  };
+
   const btn = qs('add-form').querySelector('button[type="submit"]');
   btn.disabled = true;
   try {
-    await Api.createListing({
-      title: qs('a-title').value.trim(),
-      description: qs('a-desc').value.trim(),
-      region: regionKey,
-      district: districtKey,
-      type: qs('a-type').value,
-      rooms: Number(qs('a-rooms').value),
-      area: Number(qs('a-area').value) || 0,
-      floor: qs('a-floor').value.trim(),
-      price: Number(qs('a-price').value),
-      phone: phone,
-      telegram: qs('a-tg').value.trim().replace('@', ''),
-      lat: base[0] + (Math.random() - 0.5) * spread,
-      lng: base[1] + (Math.random() - 0.5) * spread,
-    }, selectedPhotoFiles);
-
-    qs('add-form').reset();
-    selectedPhotoFiles = [];
-    renderPhotoPreview();
-    buildAddDistricts('');
-    showToast(t('published'));
+    if (state.editingId) {
+      await Api.updateListing(state.editingId, fields);
+      showToast(t('editSaved'));
+    } else {
+      await Api.createListing(fields, selectedPhotoFiles);
+      showToast(t('published'));
+    }
+    resetAddForm();
     showView('profile');
   } catch (err) {
     showToast('Xatolik: ' + err.message);
@@ -810,8 +924,13 @@ async function init() {
   qs('lang-btn').addEventListener('click', toggleLang);
 
   document.querySelectorAll('.nav-btn').forEach((btn) => {
-    btn.addEventListener('click', () => showView(btn.dataset.view));
+    btn.addEventListener('click', () => {
+      if (btn.dataset.view === 'add') resetAddForm();
+      showView(btn.dataset.view);
+    });
   });
+
+  qs('near-me-btn').addEventListener('click', findNearMe);
 
   qs('type-tabs').addEventListener('click', (e) => {
     const b = e.target.closest('[data-type]');
@@ -889,19 +1008,27 @@ async function init() {
   });
   qs('pin').addEventListener('input', () => setErr('pin', ''));
 
-  if (location.hash === '#admin') requestAdmin();
-  window.addEventListener('hashchange', () => {
+  /* #/listing/ID -> o'sha e'lonni ochish; #admin -> boshqaruv paneli */
+  function routeHash() {
+    const m = location.hash.match(/^#\/listing\/(.+)$/);
+    if (m) { openDetail(m[1], true); return; }
     if (location.hash === '#admin') requestAdmin();
-  });
+  }
+  routeHash();
+  window.addEventListener('hashchange', routeHash);
 
+  function closeAnyModal(modalEl) {
+    if (modalEl.id === 'modal-detail') closeDetailModal();
+    else modalEl.classList.remove('open');
+  }
   document.querySelectorAll('[data-close-modal]').forEach((btn) => {
-    btn.addEventListener('click', () => btn.closest('.modal').classList.remove('open'));
+    btn.addEventListener('click', () => closeAnyModal(btn.closest('.modal')));
   });
   document.querySelectorAll('.modal').forEach((m) => {
-    m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); });
+    m.addEventListener('click', (e) => { if (e.target === m) closeAnyModal(m); });
   });
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') document.querySelectorAll('.modal.open').forEach((m) => m.classList.remove('open'));
+    if (e.key === 'Escape') document.querySelectorAll('.modal.open').forEach(closeAnyModal);
   });
 
   qs('confirm-cancel').addEventListener('click', () => {
@@ -920,12 +1047,23 @@ async function init() {
     if (!el) return;
     if (el.dataset.action === 'fav') { e.stopPropagation(); toggleFav(el.dataset.id); return; }
     if (el.dataset.action === 'open') openDetail(el.dataset.id);
+    if (el.dataset.action === 'share-listing') { e.stopPropagation(); shareListing(el.dataset.id); return; }
     if (el.dataset.action === 'open-auth') openAuthModal(el.dataset.role);
     if (el.dataset.action === 'logout') logout();
     if (el.dataset.action === 'go-admin') showView('admin');
     if (el.dataset.action === 'delete-listing') deleteListing(el.dataset.id);
-    if (el.dataset.action === 'approve-listing') setListingStatus(el.dataset.id, 'approved');
-    if (el.dataset.action === 'reject-listing') setListingStatus(el.dataset.id, 'rejected');
+    if (el.dataset.action === 'edit-listing') {
+      const item = myListingsCache.find((x) => x.id === el.dataset.id);
+      if (item) startEditListing(item);
+    }
+    if (el.dataset.action === 'approve-listing') {
+      const note = document.querySelector(`.admin-note-input[data-id="${el.dataset.id}"]`);
+      setListingStatus(el.dataset.id, 'approved', note ? note.value.trim() : '');
+    }
+    if (el.dataset.action === 'reject-listing') {
+      const note = document.querySelector(`.admin-note-input[data-id="${el.dataset.id}"]`);
+      setListingStatus(el.dataset.id, 'rejected', note ? note.value.trim() : '');
+    }
   });
 }
 

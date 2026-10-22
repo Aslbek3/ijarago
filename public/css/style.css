@@ -152,6 +152,13 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
 }
 .filters select:focus { border-color: var(--brand); }
 
+.pill-btn {
+  flex: 1 1 100%; border: 1px dashed var(--brand); background: var(--tile);
+  color: var(--brand); border-radius: var(--r-btn); padding: 9px 8px;
+  font-size: .82rem; font-weight: 600; cursor: pointer;
+}
+.pill-btn:hover { background: var(--tile-active); }
+
 /* ---------- E'lon kartasi ---------- */
 .card-list { display: flex; flex-direction: column; gap: 12px; }
 
@@ -427,6 +434,17 @@ button, input, select, textarea { font-family: inherit; font-size: 1rem; }
   color: var(--danger); border-radius: var(--r-btn); padding: 9px;
   font-size: .85rem; font-weight: 600; cursor: pointer;
 }
+.edit-btn {
+  margin-top: 8px; width: 100%; border: 1px solid var(--border); background: #fff;
+  color: var(--text); border-radius: var(--r-btn); padding: 9px;
+  font-size: .85rem; font-weight: 600; cursor: pointer;
+}
+.admin-note-input {
+  width: 100%; margin-top: 10px; border: 1px solid var(--border); border-radius: var(--r-btn);
+  padding: 9px 11px; font-size: .85rem; background: #fff; color: var(--text);
+  outline: none; resize: vertical; min-height: 44px;
+}
+.admin-note-input:focus { border-color: var(--brand); }
 
 /* ---------- Desktop ---------- */
 @media (min-width: 900px) {

@@ -51,6 +51,7 @@
         <select id="f-district" hidden></select>
         <select id="f-rooms"></select>
         <select id="f-price"></select>
+        <button type="button" id="near-me-btn" class="pill-btn">📍 <span data-i18n="nearMe">Yaqin atrofimda</span></button>
       </div>
 
       <div class="section-head">
@@ -126,10 +127,12 @@
         <label for="a-desc" data-i18n="fDesc">Tavsif</label>
         <textarea id="a-desc" rows="3" data-i18n-ph="fDescPh" placeholder="Uy haqida qisqacha..."></textarea>
 
-        <label for="a-photos" data-i18n="fPhotos">Rasmlar (ixtiyoriy, 6 tagacha)</label>
-        <input type="file" id="a-photos" accept="image/jpeg,image/png,image/webp" multiple>
-        <small class="field-error" id="err-a-photos"></small>
-        <div id="photo-preview" class="photo-preview"></div>
+        <div id="a-photos-wrap">
+          <label for="a-photos" data-i18n="fPhotos">Rasmlar (ixtiyoriy, 6 tagacha)</label>
+          <input type="file" id="a-photos" accept="image/jpeg,image/png,image/webp" multiple>
+          <small class="field-error" id="err-a-photos"></small>
+          <div id="photo-preview" class="photo-preview"></div>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-block" data-i18n="publish">E'lonni joylash</button>
       </form>
