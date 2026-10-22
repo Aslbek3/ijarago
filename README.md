@@ -46,6 +46,14 @@ python -m http.server 8000
 git subtree push --prefix public origin gh-pages
 ```
 
+## Backend (server/)
+
+PocketBase v0.40.5 uchun fayllar tayyor: jadvallar (migratsiya), server qoidalari (hook),
+o'rnatish skripti, nginx va systemd sozlamalari. Port **8091**, boshqa loyihalarga tegmaydi.
+
+> **Holati:** yozilgan, lekin serverda ishga tushirib **sinalmagan**; frontend hali API'ga ulanmagan
+> (hozircha `localStorage`). O'rnatish va muammolar: [`server/README.md`](server/README.md).
+
 ## Holati
 
 Demo. Keyingi bosqich — haqiqiy baza (e'lonlar hamma foydalanuvchiga
