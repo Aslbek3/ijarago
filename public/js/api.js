@@ -14,7 +14,7 @@
 const Api = (() => {
   const USER_KEY = 'ijarago_user_auth';
   const ADMIN_KEY = 'ijarago_admin_auth';
-  const ADMIN_EMAIL = 'aslbekno07@gmail.com';
+  const ADMIN_EMAIL = 'testadmin@ijarago.local';
 
   /* ---------- past darajadagi so'rov ---------- */
   async function request(path, { method = 'GET', body, token, isForm = false } = {}) {
