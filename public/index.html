@@ -84,7 +84,7 @@
       <div class="section-head">
         <h2 data-i18n="addTitle">E'lon berish</h2>
       </div>
-      <p class="note" data-i18n="addNote">Demo rejim: e'lon faqat shu brauzerda saqlanadi.</p>
+      <p class="note" data-i18n="addNote">E'lon yuborilgach moderatordan o'tgandan keyin hammaga ko'rinadi.</p>
       <form id="add-form" novalidate>
         <label for="a-title" data-i18n="fTitle">Sarlavha</label>
         <input type="text" id="a-title" data-i18n-ph="fTitlePh" placeholder="2 xonali kvartira, markazda">
@@ -106,6 +106,12 @@
         <label for="a-rooms" data-i18n="fRooms">Xonalar soni</label>
         <select id="a-rooms"></select>
 
+        <label for="a-area" data-i18n="fArea">Maydoni (m²)</label>
+        <input type="number" id="a-area" min="1" placeholder="54">
+
+        <label for="a-floor" data-i18n="fFloor">Qavat</label>
+        <input type="text" id="a-floor" placeholder="5/9">
+
         <label for="a-price" data-i18n="fPrice">Narxi (so'm)</label>
         <input type="number" id="a-price" min="0" placeholder="3000000">
         <small class="field-error" id="err-a-price"></small>
@@ -120,8 +126,32 @@
         <label for="a-desc" data-i18n="fDesc">Tavsif</label>
         <textarea id="a-desc" rows="3" data-i18n-ph="fDescPh" placeholder="Uy haqida qisqacha..."></textarea>
 
+        <label for="a-photos" data-i18n="fPhotos">Rasmlar (ixtiyoriy, 6 tagacha)</label>
+        <input type="file" id="a-photos" accept="image/jpeg,image/png,image/webp" multiple>
+        <small class="field-error" id="err-a-photos"></small>
+        <div id="photo-preview" class="photo-preview"></div>
+
         <button type="submit" class="btn btn-primary btn-block" data-i18n="publish">E'lonni joylash</button>
       </form>
+    </section>
+
+    <!-- PROFIL / AKKAUNT -->
+    <section id="view-profile" class="view">
+      <div class="section-head">
+        <h2 data-i18n="profileTitle">Profil</h2>
+      </div>
+      <div id="profile-view"></div>
+    </section>
+
+    <!-- BOSHQARUV PANELI (ADMIN) -->
+    <section id="view-admin" class="view">
+      <div class="section-head">
+        <h2 data-i18n="adminTitle">Boshqaruv paneli</h2>
+        <button type="button" class="link-btn" id="admin-exit" data-i18n="adminExit">Chiqish</button>
+      </div>
+      <p class="note">Bu panel haqiqiy server (PocketBase) orqali himoyalangan.</p>
+      <div id="admin-stats" class="admin-stats"></div>
+      <div id="admin-list" class="card-list"></div>
     </section>
 
   </main>
@@ -131,6 +161,7 @@
     <button class="nav-btn" data-view="map"><b>🗺</b><span data-i18n="navMap">Xarita</span></button>
     <button class="nav-btn" data-view="saved"><b>♡</b><span data-i18n="navSaved">Saqlangan</span></button>
     <button class="nav-btn" data-view="add"><b>＋</b><span data-i18n="navAdd">E'lon</span></button>
+    <button class="nav-btn" data-view="profile"><b>👤</b><span data-i18n="navProfile">Profil</span></button>
   </nav>
 </div>
 
@@ -142,9 +173,67 @@
   </div>
 </div>
 
+<!-- KIRISH / RO'YXATDAN O'TISH -->
+<div class="modal" id="modal-auth">
+  <div class="sheet">
+    <button class="close" data-close-modal>×</button>
+    <h3 data-i18n="authTitle">Kirish</h3>
+
+    <div class="role-tabs">
+      <button type="button" data-role-tab="owner" class="active" data-i18n="roleOwner">🏠 Uy egasi</button>
+      <button type="button" data-role-tab="realtor" data-i18n="roleRealtor">🧑‍💼 Rielter</button>
+    </div>
+
+    <form id="auth-form" novalidate>
+      <label for="auth-name" data-i18n="fName">Ism familiyangiz</label>
+      <input type="text" id="auth-name" required>
+      <small class="field-error" id="err-auth-name"></small>
+
+      <label for="auth-phone" data-i18n="fPhone">Telefon</label>
+      <input type="tel" id="auth-phone" placeholder="+998 90 123 45 67" required>
+      <small class="field-error" id="err-auth-phone"></small>
+
+      <label for="auth-tg" data-i18n="fTg">Telegram (ixtiyoriy)</label>
+      <input type="text" id="auth-tg" placeholder="@username">
+
+      <button type="submit" class="btn btn-primary btn-block" data-i18n="authSubmit">Davom etish</button>
+    </form>
+
+    <p class="note" data-i18n="authNote">Telefon raqamingiz akkauntingizni aniqlaydi — shu raqam bilan istalgan qurilmadan kira olasiz.</p>
+  </div>
+</div>
+
+<!-- ADMIN KIRISH -->
+<div class="modal" id="modal-pin">
+  <div class="sheet sheet-confirm">
+    <h3 data-i18n="adminTitle">Boshqaruv paneli</h3>
+    <p class="note" data-i18n="pinNote">Davom etish uchun admin parolni kiriting.</p>
+    <form id="pin-form" novalidate>
+      <input type="password" id="pin" autocomplete="off" maxlength="60" placeholder="Parol">
+      <small class="field-error" id="err-pin"></small>
+      <div class="btn-row">
+        <button type="button" class="btn btn-secondary" id="pin-cancel" data-i18n="cancel">Bekor qilish</button>
+        <button type="submit" class="btn btn-primary" data-i18n="enter">Kirish</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- TASDIQLASH -->
+<div class="modal" id="modal-confirm">
+  <div class="sheet sheet-confirm">
+    <p id="confirm-message"></p>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="confirm-cancel" data-i18n="cancel">Bekor qilish</button>
+      <button class="btn btn-danger" id="confirm-ok" data-i18n="ok">Tasdiqlash</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="js/api.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

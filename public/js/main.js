@@ -1,5 +1,6 @@
-/* ===== IjaraGo — demo MVP (frontend-only, localStorage) =====
-   Backend yo'q: e'lonlar va saqlanganlar faqat shu brauzerda turadi. */
+/* ===== IjaraGo — PocketBase backend bilan ishlaydigan versiya =====
+   E'lonlar, mening e'lonlarim va admin moderatsiya — api.js orqali
+   PocketBase'ga ulanadi. Saqlangan (♡) ro'yxati shu brauzerda qoladi. */
 
 /* ---------- i18n ---------- */
 const I18N = {
@@ -14,19 +15,21 @@ const I18N = {
     mapNote: "Xarita internet talab qiladi. Belgini bosing — e'lon ochiladi.",
     savedTitle: 'Saqlangan',
     addTitle: "E'lon berish",
-    addNote: "Demo rejim: e'lon faqat shu brauzerda saqlanadi.",
+    addNote: "E'lon yuborilgach moderatordan o'tgandan keyin hammaga ko'rinadi.",
     fTitle: 'Sarlavha', fTitlePh: '2 xonali kvartira, markazda',
     fRegion: 'Hudud', fType: 'Ijara turi', fRooms: 'Xonalar soni',
+    fArea: 'Maydoni (m²)', fFloor: 'Qavat',
     fPrice: "Narxi (so'm)", fPhone: 'Telefon', fTg: 'Telegram (ixtiyoriy)',
     fDesc: 'Tavsif', fDescPh: 'Uy haqida qisqacha...',
+    fPhotos: 'Rasmlar (ixtiyoriy, 6 tagacha)',
     publish: "E'lonni joylash",
-    navHome: 'Bosh sahifa', navMap: 'Xarita', navSaved: 'Saqlangan', navAdd: "E'lon",
+    navHome: 'Bosh sahifa', navMap: 'Xarita', navSaved: 'Saqlangan', navAdd: "E'lon", navProfile: 'Profil',
     all: 'Barchasi', daily: 'Kunlik', long: 'Uzoq muddatli',
     allRegions: 'Barcha hududlar', anyRooms: 'Xona soni', anyPrice: 'Narx',
     rooms: 'xona', perDay: "so'm/kun", perMonth: "so'm/oy",
     call: "Qo'ng'iroq", telegram: 'Telegram',
     saved: 'Saqlandi', unsaved: "Saqlanganlardan o'chirildi",
-    published: "E'lon joylandi",
+    published: "E'lon yuborildi — moderatordan o'tgach ko'rinadi",
     noResults: "Hech narsa topilmadi. Filtrlarni o'zgartiring.",
     noSaved: "Saqlangan e'lon yo'q. Kartadagi ♡ ni bosing.",
     descTitle: 'Tavsif', contactTitle: "Bog'lanish",
@@ -36,6 +39,31 @@ const I18N = {
     countSuffix: 'ta', floor: 'qavat', chooseRegion: 'Hududni tanlang',
     fDistrict: 'Tuman', allDistricts: 'Barcha tumanlar', chooseDistrict: 'Tumanni tanlang', errDistrict: 'Tumanni tanlang',
     mapOffline: "Xarita yuklanmadi. Internet aloqasini tekshiring.",
+    loadError: "Yuklab bo'lmadi, internetni tekshiring.",
+
+    profileTitle: 'Profil',
+    authTitle: 'Kirish', authSubmit: 'Davom etish',
+    authNote: "Telefon raqamingiz akkauntingizni aniqlaydi — shu raqam bilan istalgan qurilmadan kira olasiz.",
+    roleOwner: '🏠 Uy egasi', roleRealtor: '🧑‍💼 Rielter',
+    roleOwnerNote: "Uyimni ijaraga beraman", roleRealtorNote: "Mijozlarga uy topib beraman",
+    fName: 'Ism familiyangiz', errName: 'Ismingizni kiriting',
+    loginIntro: 'Akkauntga kiring', loginIntroNote: "E'lon berish va o'z e'lonlaringizni kuzatish uchun akkaunt oching.",
+    myListings: 'Mening e’lonlarim', noMyListings: "Hali e'lon bermagansiz.",
+    statusPending: 'Kutilmoqda', statusApproved: 'Tasdiqlangan', statusRejected: 'Rad etilgan',
+    logout: 'Akkauntdan chiqish', loggedOut: 'Akkauntdan chiqdingiz',
+    welcome: 'Xush kelibsiz, ',
+    loginFirst: "Avval akkauntga kiring",
+    deleteListing: "E'lonni o'chirish", deleteConfirm: "E'lonni o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+    deleted: "E'lon o'chirildi",
+    goToAdmin: '⚙ Boshqaruv paneli',
+
+    adminTitle: 'Boshqaruv paneli', adminExit: 'Chiqish',
+    pinNote: 'Davom etish uchun admin parolni kiriting.', pinWrong: "Parol noto'g'ri",
+    cancel: 'Bekor qilish', enter: 'Kirish', ok: 'Tasdiqlash',
+    adminApprove: 'Tasdiqlash', adminReject: 'Rad etish',
+    adminEmpty: "Hali e'lon yo'q.", adminOpened: 'Boshqaruv paneli ochildi',
+    statTotal: 'Jami', statPending: 'Kutilmoqda', statApproved: 'Tasdiqlangan', statRejected: 'Rad etilgan',
+    photoTooMany: "Ko'pi bilan 6 ta rasm yuklash mumkin",
   },
   ru: {
     tagline: 'Найти жильё просто',
@@ -48,19 +76,21 @@ const I18N = {
     mapNote: 'Карта требует интернет. Нажмите на метку — откроется объявление.',
     savedTitle: 'Избранное',
     addTitle: 'Разместить объявление',
-    addNote: 'Демо-режим: объявление сохраняется только в этом браузере.',
+    addNote: 'После проверки модератором объявление станет видно всем.',
     fTitle: 'Заголовок', fTitlePh: '2-комнатная квартира, в центре',
     fRegion: 'Регион', fType: 'Тип аренды', fRooms: 'Количество комнат',
+    fArea: 'Площадь (м²)', fFloor: 'Этаж',
     fPrice: 'Цена (сум)', fPhone: 'Телефон', fTg: 'Telegram (необязательно)',
     fDesc: 'Описание', fDescPh: 'Кратко о жилье...',
+    fPhotos: 'Фото (необязательно, до 6)',
     publish: 'Разместить',
-    navHome: 'Главная', navMap: 'Карта', navSaved: 'Избранное', navAdd: 'Подать',
+    navHome: 'Главная', navMap: 'Карта', navSaved: 'Избранное', navAdd: 'Подать', navProfile: 'Профиль',
     all: 'Все', daily: 'Посуточно', long: 'Долгосрочно',
     allRegions: 'Все регионы', anyRooms: 'Комнат', anyPrice: 'Цена',
     rooms: 'комн.', perDay: 'сум/сутки', perMonth: 'сум/мес',
     call: 'Позвонить', telegram: 'Telegram',
     saved: 'Сохранено', unsaved: 'Удалено из избранного',
-    published: 'Объявление размещено',
+    published: 'Объявление отправлено — появится после проверки модератором',
     noResults: 'Ничего не найдено. Измените фильтры.',
     noSaved: 'Нет сохранённых. Нажмите ♡ на карточке.',
     descTitle: 'Описание', contactTitle: 'Связаться',
@@ -70,6 +100,31 @@ const I18N = {
     countSuffix: 'шт.', floor: 'этаж', chooseRegion: 'Выберите регион',
     fDistrict: 'Район', allDistricts: 'Все районы', chooseDistrict: 'Выберите район', errDistrict: 'Выберите район',
     mapOffline: 'Карта не загрузилась. Проверьте подключение к интернету.',
+    loadError: 'Не удалось загрузить, проверьте интернет.',
+
+    profileTitle: 'Профиль',
+    authTitle: 'Вход', authSubmit: 'Продолжить',
+    authNote: 'Ваш номер телефона определяет аккаунт — вы можете войти с этим номером с любого устройства.',
+    roleOwner: '🏠 Владелец', roleRealtor: '🧑‍💼 Риелтор',
+    roleOwnerNote: 'Сдаю своё жильё', roleRealtorNote: 'Помогаю клиентам найти жильё',
+    fName: 'Имя и фамилия', errName: 'Введите имя',
+    loginIntro: 'Войдите в аккаунт', loginIntroNote: 'Откройте аккаунт, чтобы размещать объявления и отслеживать их.',
+    myListings: 'Мои объявления', noMyListings: 'Вы ещё не публиковали объявления.',
+    statusPending: 'На проверке', statusApproved: 'Одобрено', statusRejected: 'Отклонено',
+    logout: 'Выйти из аккаунта', loggedOut: 'Вы вышли из аккаунта',
+    welcome: 'Добро пожаловать, ',
+    loginFirst: 'Сначала войдите в аккаунт',
+    deleteListing: 'Удалить объявление', deleteConfirm: 'Удалить объявление? Это действие нельзя отменить.',
+    deleted: 'Объявление удалено',
+    goToAdmin: '⚙ Панель управления',
+
+    adminTitle: 'Панель управления', adminExit: 'Выход',
+    pinNote: 'Введите пароль администратора.', pinWrong: 'Неверный пароль',
+    cancel: 'Отмена', enter: 'Войти', ok: 'Подтвердить',
+    adminApprove: 'Одобрить', adminReject: 'Отклонить',
+    adminEmpty: 'Пока нет объявлений.', adminOpened: 'Панель управления открыта',
+    statTotal: 'Всего', statPending: 'На проверке', statApproved: 'Одобрено', statRejected: 'Отклонено',
+    photoTooMany: 'Можно загрузить максимум 6 фото',
   },
 };
 
@@ -92,8 +147,7 @@ const REGIONS = [
 ];
 
 /* Tumanlar. Hozircha faqat Toshkent shahri (12 ta tuman); boshqa hududlar
-   rasmiy royxatdan toldiriladi. Koordinatalar taxminiy - xaritada belgi
-   tuman ichida turishi uchun, aniq manzil uchun emas. */
+   rasmiy ro'yxatdan to'ldiriladi. Koordinatalar taxminiy. */
 const DISTRICTS = {
   'toshkent-sh': [
     { key: 'bektemir',      uz: 'Bektemir',        ru: 'Бектемир',      lat: 41.210, lng: 69.335 },
@@ -120,23 +174,14 @@ const PHOTO_STYLES = [
   'linear-gradient(135deg,#157f4a,#0f5e36)',
 ];
 const PHOTO_ICONS = ['🏢', '🏠', '🏡', '🌇', '🪟', '🛋️'];
+const AVATAR_COLORS = ['#17634f', '#2a9d8f', '#2b7a9b', '#5e60ce', '#c9811b', '#8a6d3b'];
 
-/* ---------- Demo e'lonlar ---------- */
-const DEMO = [
-  { id: 'd1', title: { uz: '2 xonali kvartira, Chilonzor', ru: '2-комн. квартира, Чиланзар' }, region: 'toshkent-sh', district: 'chilonzor', type: 'long', rooms: 2, price: 4500000, floor: '5/9', area: 54, phone: '+998901234567', tg: 'ijarago_demo', lat: 41.275, lng: 69.204, desc: { uz: "Metro yaqinida, ta'mirlangan, mebel va texnika bilan.", ru: 'Рядом метро, с ремонтом, мебель и техника.' } },
-  { id: 'd2', title: { uz: 'Lyuks studiya, Yunusobod', ru: 'Люкс-студия, Юнусабад' }, region: 'toshkent-sh', district: 'yunusobod', type: 'daily', rooms: 1, price: 350000, floor: '7/12', area: 38, phone: '+998902345678', tg: 'ijarago_demo', lat: 41.367, lng: 69.289, desc: { uz: 'Kunlik ijara, yangi bino, konditsioner va Wi-Fi.', ru: 'Посуточно, новый дом, кондиционер и Wi-Fi.' } },
-  { id: 'd3', title: { uz: '3 xonali uy, Registon yaqinida', ru: '3-комн. дом, рядом с Регистаном' }, region: 'samarqand', type: 'daily', rooms: 3, price: 600000, floor: '1/1', area: 90, phone: '+998903456789', tg: '', lat: 39.655, lng: 66.975, desc: { uz: 'Sayyohlar uchun qulay, hovli bor, markazga piyoda.', ru: 'Удобно туристам, есть двор, до центра пешком.' } },
-  { id: 'd4', title: { uz: '1 xonali kvartira, Buxoro markazi', ru: '1-комн. квартира, центр Бухары' }, region: 'buxoro', type: 'long', rooms: 1, price: 2200000, floor: '3/5', area: 40, phone: '+998904567890', tg: 'ijarago_demo', lat: 39.774, lng: 64.428, desc: { uz: 'Markazda, do‘kon va bozor yaqin, uzoq muddatga.', ru: 'В центре, рядом магазины и базар, на длительный срок.' } },
-  { id: 'd5', title: { uz: '4 xonali kottej, Toshkent viloyati', ru: '4-комн. коттедж, Ташкентская обл.' }, region: 'toshkent-v', type: 'daily', rooms: 4, price: 1200000, floor: '2/2', area: 160, phone: '+998905678901', tg: 'ijarago_demo', lat: 41.100, lng: 69.700, desc: { uz: 'Dam olish uchun, basseyn va katta hovli.', ru: 'Для отдыха, бассейн и большой двор.' } },
-  { id: 'd6', title: { uz: '2 xonali kvartira, Andijon', ru: '2-комн. квартира, Андижан' }, region: 'andijon', type: 'long', rooms: 2, price: 1800000, floor: '4/5', area: 48, phone: '+998906789012', tg: '', lat: 40.785, lng: 72.345, desc: { uz: 'Oilaviy uchun qulay, maktab va bog‘cha yaqin.', ru: 'Удобно для семьи, рядом школа и садик.' } },
-  { id: 'd7', title: { uz: 'Studiya, Farg‘ona markazi', ru: 'Студия, центр Ферганы' }, region: 'fargona', type: 'daily', rooms: 1, price: 250000, floor: '2/4', area: 32, phone: '+998907890123', tg: 'ijarago_demo', lat: 40.390, lng: 71.790, desc: { uz: 'Arzon kunlik ijara, tozalik va Wi-Fi bor.', ru: 'Недорого посуточно, чисто, есть Wi-Fi.' } },
-  { id: 'd8', title: { uz: '3 xonali kvartira, Namangan', ru: '3-комн. квартира, Наманган' }, region: 'namangan', type: 'long', rooms: 3, price: 2600000, floor: '6/9', area: 72, phone: '+998908901234', tg: '', lat: 41.000, lng: 71.668, desc: { uz: 'Keng xonalar, yangi ta‘mir, avtoturargoh bor.', ru: 'Просторные комнаты, свежий ремонт, парковка.' } },
-];
+const STATUS_LABEL_KEY = { pending: 'statusPending', approved: 'statusApproved', rejected: 'statusRejected' };
+const LOGO_TAPS_NEEDED = 5;
 
-/* ---------- Holat va saqlash ---------- */
+/* ---------- Holat ---------- */
 const LANG_KEY = 'ijarago_lang';
 const SAVED_KEY = 'ijarago_saved';
-const MINE_KEY = 'ijarago_mine';
 
 const state = {
   lang: 'uz',
@@ -147,11 +192,17 @@ const state = {
   price: '',
   query: '',
   view: 'home',
+  authRole: 'owner',
 };
 
+let listingsCache = [];
 let map = null;
 let markerLayer = null;
 let toastTimer = null;
+let logoTaps = 0;
+let logoTapTimer = null;
+let confirmCallback = null;
+let selectedPhotoFiles = [];
 
 function qs(id) { return document.getElementById(id); }
 
@@ -173,10 +224,14 @@ function writeJson(key, value) {
 }
 
 function getSaved() { return readJson(SAVED_KEY, []); }
-function getMine() { return readJson(MINE_KEY, []); }
 
-/* Demo e'lonlar + foydalanuvchi qo'shganlari */
-function allListings() { return DEMO.concat(getMine()); }
+async function loadListings() {
+  try {
+    listingsCache = await Api.listApproved();
+  } catch (e) {
+    showToast(t('loadError'));
+  }
+}
 
 function regionById(key) { return REGIONS.find((r) => r.key === key); }
 function regionName(key) {
@@ -185,12 +240,10 @@ function regionName(key) {
 }
 function districtsOf(regionKey) { return DISTRICTS[regionKey] || []; }
 function districtById(regionKey, key) { return districtsOf(regionKey).find((d) => d.key === key); }
-/* "Chilonzor, Toshkent shahri" yoki tuman bolmasa faqat hudud */
 function locText(item) {
   const d = item.district ? districtById(item.region, item.district) : null;
   return d ? d[state.lang] + ', ' + regionName(item.region) : regionName(item.region);
 }
-/* Aniq nuqta > tuman markazi > hudud markazi > Ozbekiston markazi */
 function coordsOf(item) {
   if (item.lat && item.lng) return [item.lat, item.lng];
   const d = item.district ? districtById(item.region, item.district) : null;
@@ -198,13 +251,8 @@ function coordsOf(item) {
   const r = regionById(item.region);
   return r ? [r.lat, r.lng] : [41.3, 69.25];
 }
-function titleOf(item) {
-  return typeof item.title === 'string' ? item.title : (item.title[state.lang] || item.title.uz);
-}
-function descOf(item) {
-  if (!item.desc) return '';
-  return typeof item.desc === 'string' ? item.desc : (item.desc[state.lang] || item.desc.uz);
-}
+function titleOf(item) { return item.title || ''; }
+function descOf(item) { return item.description || ''; }
 function priceText(item) {
   const n = Number(item.price).toLocaleString('ru-RU');
   return n + ' ' + (item.type === 'daily' ? t('perDay') : t('perMonth'));
@@ -213,6 +261,29 @@ function photoStyle(id) {
   let h = 0;
   for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
   return { bg: PHOTO_STYLES[h % PHOTO_STYLES.length], icon: PHOTO_ICONS[h % PHOTO_ICONS.length] };
+}
+function avatarColor(id) {
+  let h = 0;
+  const s = String(id || '');
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+function initials(name) {
+  return String(name || '').split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
+}
+
+/* Birinchi rasm bo'lsa shuni, bo'lmasa rangli placeholder ko'rsatadi */
+function photoBlockHtml(item, size) {
+  if (item.photos && item.photos.length) {
+    const url = Api.photoUrl(item, item.photos[0], size === 'big' ? '800x600' : '400x300');
+    return `style="background-image:url('${esc(url)}');background-size:cover;background-position:center"`;
+  }
+  const p = photoStyle(item.id);
+  return `style="background:${p.bg}"`;
+}
+function photoIconHtml(item) {
+  if (item.photos && item.photos.length) return '';
+  return `<span>${photoStyle(item.id).icon}</span>`;
 }
 
 function showToast(message) {
@@ -233,6 +304,7 @@ function applyLang() {
   buildFilters();
   buildAddSelects();
   renderAll();
+  if (state.view === 'profile') renderProfile();
 }
 
 function toggleLang() {
@@ -267,7 +339,6 @@ function buildFilters() {
 }
 
 function buildAddSelects() {
-  /* Til almashtirilganda forma bosh qolmasligi uchun tanlovlarni saqlab turamiz */
   const keep = { region: qs('a-region').value, type: qs('a-type').value, rooms: qs('a-rooms').value, district: qs('a-district').value };
 
   qs('a-region').innerHTML = `<option value="">${esc(t('chooseRegion'))}</option>` +
@@ -282,7 +353,6 @@ function buildAddSelects() {
   buildAddDistricts(keep.district);
 }
 
-/* Tanlangan hududda tumanlar bolsagina tuman maydoni korinadi */
 function buildAddDistricts(selected) {
   const ds = districtsOf(qs('a-region').value);
   qs('a-district-wrap').hidden = ds.length === 0;
@@ -294,7 +364,7 @@ function buildAddDistricts(selected) {
 /* ---------- Filtrlash ---------- */
 function filtered() {
   const q = state.query.trim().toLowerCase();
-  return allListings().filter((item) => {
+  return listingsCache.filter((item) => {
     if (state.type !== 'all' && item.type !== state.type) return false;
     if (state.region && item.region !== state.region) return false;
     if (state.district && item.district !== state.district) return false;
@@ -312,19 +382,18 @@ function filtered() {
 
 /* ---------- Chizish ---------- */
 function cardHtml(item) {
-  const p = photoStyle(item.id);
   const fav = getSaved().includes(item.id);
   return `
     <article class="listing" data-action="open" data-id="${esc(item.id)}">
-      <div class="listing-photo" style="background:${p.bg}">
-        <span>${p.icon}</span>
+      <div class="listing-photo" ${photoBlockHtml(item)}>
+        ${photoIconHtml(item)}
         <span class="listing-badge">${esc(item.type === 'daily' ? t('daily') : t('long'))}</span>
         <button type="button" class="listing-fav" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
       </div>
       <div class="listing-body">
         <div class="listing-price">${esc(priceText(item))}</div>
         <div class="listing-title">${esc(titleOf(item))}</div>
-        <div class="listing-meta">${esc(locText(item))} · ${esc(item.rooms)} ${esc(t('rooms'))} · ${esc(item.area)} m²</div>
+        <div class="listing-meta">${esc(locText(item))} · ${esc(item.rooms)} ${esc(t('rooms'))} · ${esc(item.area || 0)} m²</div>
       </div>
     </article>
   `;
@@ -340,7 +409,7 @@ function renderHome() {
 
 function renderSaved() {
   const ids = getSaved();
-  const list = allListings().filter((item) => ids.includes(item.id));
+  const list = listingsCache.filter((item) => ids.includes(item.id));
   qs('saved-list').innerHTML = list.length
     ? list.map(cardHtml).join('')
     : `<div class="empty-state">${esc(t('noSaved'))}</div>`;
@@ -355,7 +424,7 @@ function renderAll() {
 
 /* ---------- Xarita ---------- */
 function renderMap() {
-  if (typeof L === 'undefined') {                   /* Leaflet yuklanmagan (internet yo'q) */
+  if (typeof L === 'undefined') {
     qs('map').innerHTML = `<div class="empty-state">${esc(t('mapOffline'))}</div>`;
     return;
   }
@@ -383,21 +452,20 @@ function renderMap() {
 
 /* ---------- Tafsilot ---------- */
 function openDetail(id) {
-  const item = allListings().find((x) => x.id === id);
+  const item = listingsCache.find((x) => x.id === id);
   if (!item) return;
-  const p = photoStyle(item.id);
   const [lat, lng] = coordsOf(item);
   const fav = getSaved().includes(item.id);
 
   qs('detail-content').innerHTML = `
-    <div class="detail-photo" style="background:${p.bg}">${p.icon}</div>
+    <div class="detail-photo" ${photoBlockHtml(item, 'big')}>${item.photos && item.photos.length ? '' : photoStyle(item.id).icon}</div>
     <div class="detail-price">${esc(priceText(item))}</div>
     <div class="detail-title">${esc(titleOf(item))}</div>
     <div class="detail-meta">${esc(locText(item))} · ${esc(item.type === 'daily' ? t('daily') : t('long'))}</div>
 
     <div class="detail-grid">
       <div class="detail-cell"><b>${esc(item.rooms)}</b><span>${esc(t('rooms'))}</span></div>
-      <div class="detail-cell"><b>${esc(item.area)}</b><span>m²</span></div>
+      <div class="detail-cell"><b>${esc(item.area || '—')}</b><span>m²</span></div>
       <div class="detail-cell"><b>${esc(item.floor || '—')}</b><span>${esc(t('floor'))}</span></div>
     </div>
 
@@ -407,7 +475,7 @@ function openDetail(id) {
       <h4>${esc(t('contactTitle'))}</h4>
       <div class="btn-row">
         <a class="btn btn-primary" href="tel:${esc(String(item.phone).replace(/\s/g, ''))}">${esc(t('call'))}</a>
-        ${item.tg ? `<a class="btn btn-tg" href="https://t.me/${esc(encodeURIComponent(String(item.tg).replace(/^@/, '').replace(/[^A-Za-z0-9_]/g, '')))}" target="_blank" rel="noopener">${esc(t('telegram'))}</a>` : ''}
+        ${item.telegram ? `<a class="btn btn-tg" href="https://t.me/${esc(encodeURIComponent(String(item.telegram).replace(/^@/, '').replace(/[^A-Za-z0-9_]/g, '')))}" target="_blank" rel="noopener">${esc(t('telegram'))}</a>` : ''}
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-secondary" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
@@ -431,6 +499,8 @@ function toggleFav(id) {
 
 /* ---------- Navigatsiya ---------- */
 function showView(name) {
+  if (name === 'admin' && !Api.isAdminUnlocked()) { requestAdmin(); return; }
+
   document.querySelectorAll('.view').forEach((v) => v.classList.remove('active'));
   qs('view-' + name).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach((b) => b.classList.toggle('active', b.dataset.view === name));
@@ -439,9 +509,25 @@ function showView(name) {
   window.scrollTo(0, 0);
   if (name === 'map') renderMap();
   if (name === 'saved') renderSaved();
+  if (name === 'profile') renderProfile();
+  if (name === 'admin') renderAdmin();
 }
 
-/* ---------- E'lon qo'shish ---------- */
+/* ---------- Kirish / ro'yxatdan o'tish ---------- */
+function openAuthModal(role) {
+  state.authRole = role === 'realtor' ? 'realtor' : 'owner';
+  renderAuthForm();
+  qs('modal-auth').classList.add('open');
+}
+
+function renderAuthForm() {
+  document.querySelectorAll('[data-role-tab]').forEach((b) => {
+    b.classList.toggle('active', b.dataset.roleTab === state.authRole);
+  });
+}
+
+const AUTH_FIELD_IDS = ['auth-name', 'auth-phone'];
+
 function setErr(id, msg) {
   const input = qs(id);
   const err = qs('err-' + id);
@@ -449,8 +535,215 @@ function setErr(id, msg) {
   if (err) err.textContent = msg || '';
 }
 
-function handleAdd(e) {
+function validateAuthForm() {
+  let ok = true;
+  AUTH_FIELD_IDS.forEach((id) => setErr(id, ''));
+  if (!qs('auth-name').value.trim()) { setErr('auth-name', t('errName')); ok = false; }
+  const phone = qs('auth-phone').value.trim();
+  if (!phone) { setErr('auth-phone', t('errPhone')); ok = false; }
+  else if (phone.replace(/\D/g, '').length < 9) { setErr('auth-phone', t('errPhone')); ok = false; }
+  return ok;
+}
+
+async function handleAuthSubmit(e) {
   e.preventDefault();
+  if (!validateAuthForm()) return;
+
+  const fields = {
+    role: state.authRole,
+    name: qs('auth-name').value.trim(),
+    phone: qs('auth-phone').value.trim(),
+    telegram: qs('auth-tg').value.trim(),
+  };
+
+  const btn = qs('auth-form').querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    const session = await Api.authenticateAccount(fields);
+    closeModal(qs('modal-auth'));
+    qs('auth-form').reset();
+    renderProfile();
+    showToast(t('welcome') + session.record.name);
+  } catch (err) {
+    showToast('Xatolik: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function logout() {
+  Api.logoutUser();
+  renderProfile();
+  showToast(t('loggedOut'));
+}
+
+/* ---------- Profil ---------- */
+async function renderProfile() {
+  const acc = Api.currentUser();
+  const box = qs('profile-view');
+
+  if (!acc) {
+    box.innerHTML = `
+      <div class="auth-intro">
+        <div class="auth-emoji">👤</div>
+        <h3>${esc(t('loginIntro'))}</h3>
+        <p>${esc(t('loginIntroNote'))}</p>
+      </div>
+      <div class="role-cards">
+        <button type="button" class="role-card" data-action="open-auth" data-role="owner">
+          <span class="role-icon">🏠</span><b>${esc(t('roleOwner'))}</b><small>${esc(t('roleOwnerNote'))}</small>
+        </button>
+        <button type="button" class="role-card" data-action="open-auth" data-role="realtor">
+          <span class="role-icon">🧑‍💼</span><b>${esc(t('roleRealtor'))}</b><small>${esc(t('roleRealtorNote'))}</small>
+        </button>
+      </div>
+      <p class="note">${esc(t('authNote'))}</p>
+    `;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="profile-card">
+      <div class="avatar" style="background:${avatarColor(acc.id)}">${esc(initials(acc.name))}</div>
+      <div class="profile-id">
+        <b>${esc(acc.name)}</b>
+        <span class="muted">${esc(acc.phone)}</span>
+        <span class="role-badge">${acc.role === 'realtor' ? esc(t('roleRealtor')) : esc(t('roleOwner'))}</span>
+      </div>
+    </div>
+    <div class="profile-block">
+      <h4>${esc(t('myListings'))}</h4>
+      <div id="my-listings-list"></div>
+    </div>
+    ${Api.isAdminUnlocked() ? `<button type="button" class="btn btn-secondary btn-block" data-action="go-admin">${esc(t('goToAdmin'))}</button>` : ''}
+    <button type="button" class="btn btn-secondary btn-block" data-action="logout">${esc(t('logout'))}</button>
+  `;
+
+  const mineBox = qs('my-listings-list');
+  mineBox.innerHTML = `<p class="muted">...</p>`;
+  try {
+    const mine = await Api.listMine();
+    mineBox.innerHTML = mine.length ? mine.map((item) => `
+      <div class="admin-listing-card">
+        <div class="admin-listing-top">
+          <b>${esc(titleOf(item) || t('listings'))}</b>
+          <span class="badge badge-${esc(item.status)}">${esc(t(STATUS_LABEL_KEY[item.status] || 'statusPending'))}</span>
+        </div>
+        <div class="admin-listing-meta">${esc(locText(item))} · ${esc(priceText(item))}</div>
+        ${item.note ? `<div class="admin-listing-meta">${esc(item.note)}</div>` : ''}
+        <button type="button" class="remove-btn" data-action="delete-listing" data-id="${esc(item.id)}">${esc(t('deleteListing'))}</button>
+      </div>
+    `).join('') : `<p class="muted">${esc(t('noMyListings'))}</p>`;
+  } catch (e) {
+    mineBox.innerHTML = `<p class="muted">${esc(t('loadError'))}</p>`;
+  }
+}
+
+function deleteListing(id) {
+  confirmDialog(t('deleteConfirm'), async () => {
+    try {
+      await Api.deleteListing(id);
+      showToast(t('deleted'));
+      await loadListings();
+      renderAll();
+      renderProfile();
+    } catch (e) {
+      showToast('Xatolik: ' + e.message);
+    }
+  });
+}
+
+/* ---------- Boshqaruv paneli (admin) ---------- */
+function requestAdmin() {
+  if (Api.isAdminUnlocked()) { showView('admin'); return; }
+  qs('pin').value = '';
+  setErr('pin', '');
+  qs('modal-pin').classList.add('open');
+  setTimeout(() => qs('pin').focus(), 50);
+}
+
+function exitAdmin() {
+  Api.adminLogout();
+  if (location.hash === '#admin') history.replaceState(null, '', location.pathname + location.search);
+  showView('home');
+  showToast(t('loggedOut'));
+}
+
+function handleLogoTap() {
+  logoTaps += 1;
+  clearTimeout(logoTapTimer);
+  logoTapTimer = setTimeout(() => { logoTaps = 0; }, 3000);
+  if (logoTaps >= LOGO_TAPS_NEEDED) {
+    logoTaps = 0;
+    requestAdmin();
+  }
+}
+
+async function renderAdmin() {
+  let items = [];
+  try {
+    items = await Api.listAllForAdmin();
+  } catch (e) {
+    qs('admin-list').innerHTML = `<div class="empty-state">${esc(t('loadError'))}</div>`;
+    return;
+  }
+
+  const counts = { pending: 0, approved: 0, rejected: 0 };
+  items.forEach((i) => { counts[i.status] = (counts[i.status] || 0) + 1; });
+
+  qs('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-value">${items.length}</div><div class="stat-label">${esc(t('statTotal'))}</div></div>
+    <div class="stat-card"><div class="stat-value">${counts.pending}</div><div class="stat-label">${esc(t('statPending'))}</div></div>
+    <div class="stat-card"><div class="stat-value">${counts.approved}</div><div class="stat-label">${esc(t('statApproved'))}</div></div>
+    <div class="stat-card"><div class="stat-value">${counts.rejected}</div><div class="stat-label">${esc(t('statRejected'))}</div></div>
+  `;
+
+  qs('admin-list').innerHTML = items.length ? items.map((item) => `
+    <div class="admin-listing-card">
+      <div class="admin-listing-top">
+        <b>${esc(titleOf(item) || '—')}</b>
+        <span class="badge badge-${esc(item.status)}">${esc(t(STATUS_LABEL_KEY[item.status] || 'statusPending'))}</span>
+      </div>
+      <div class="admin-listing-meta">${esc(locText(item))} · ${esc(priceText(item))} · ${esc(item.phone)}</div>
+      <div class="admin-listing-actions">
+        <button type="button" class="btn btn-primary" data-action="approve-listing" data-id="${esc(item.id)}">${esc(t('adminApprove'))}</button>
+        <button type="button" class="btn btn-danger" data-action="reject-listing" data-id="${esc(item.id)}">${esc(t('adminReject'))}</button>
+      </div>
+    </div>
+  `).join('') : `<div class="empty-state">${esc(t('adminEmpty'))}</div>`;
+}
+
+async function setListingStatus(id, status) {
+  try {
+    await Api.updateListingStatus(id, status);
+    renderAdmin();
+    await loadListings();
+    renderAll();
+  } catch (e) {
+    showToast('Xatolik: ' + e.message);
+  }
+}
+
+/* ---------- E'lon qo'shish ---------- */
+function renderPhotoPreview() {
+  const box = qs('photo-preview');
+  box.innerHTML = '';
+  selectedPhotoFiles.forEach((file) => {
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    box.appendChild(img);
+  });
+}
+
+async function handleAdd(e) {
+  e.preventDefault();
+
+  if (!Api.currentUser()) {
+    showToast(t('loginFirst'));
+    showView('profile');
+    return;
+  }
+
   let ok = true;
   ['a-title', 'a-region', 'a-district', 'a-price', 'a-phone'].forEach((id) => setErr(id, ''));
 
@@ -466,36 +759,52 @@ function handleAdd(e) {
   const districtKey = districtsOf(regionKey).length ? qs('a-district').value : '';
   const base = coordsOf({ region: regionKey, district: districtKey });
   const spread = districtKey ? 0.008 : 0.04;
-  const mine = getMine();
-  mine.unshift({
-    id: 'm' + Date.now(),
-    title: qs('a-title').value.trim(),
-    region: regionKey,
-    district: districtKey,
-    type: qs('a-type').value,
-    rooms: Number(qs('a-rooms').value),
-    price: Number(qs('a-price').value),
-    area: 50,
-    floor: '—',
-    phone: phone,
-    tg: qs('a-tg').value.trim().replace('@', ''),
-    desc: qs('a-desc').value.trim(),
-    lat: base[0] + (Math.random() - 0.5) * spread,
-    lng: base[1] + (Math.random() - 0.5) * spread,
-  });
-  writeJson(MINE_KEY, mine);
-  qs('add-form').reset();
-  buildAddDistricts('');
-  showToast(t('published'));
-  state.type = 'all'; state.region = ''; state.district = ''; state.rooms = ''; state.price = ''; state.query = '';
-  buildTabs(); buildFilters();
-  renderAll();
-  showView('home');
+
+  const btn = qs('add-form').querySelector('button[type="submit"]');
+  btn.disabled = true;
+  try {
+    await Api.createListing({
+      title: qs('a-title').value.trim(),
+      description: qs('a-desc').value.trim(),
+      region: regionKey,
+      district: districtKey,
+      type: qs('a-type').value,
+      rooms: Number(qs('a-rooms').value),
+      area: Number(qs('a-area').value) || 0,
+      floor: qs('a-floor').value.trim(),
+      price: Number(qs('a-price').value),
+      phone: phone,
+      telegram: qs('a-tg').value.trim().replace('@', ''),
+      lat: base[0] + (Math.random() - 0.5) * spread,
+      lng: base[1] + (Math.random() - 0.5) * spread,
+    }, selectedPhotoFiles);
+
+    qs('add-form').reset();
+    selectedPhotoFiles = [];
+    renderPhotoPreview();
+    buildAddDistricts('');
+    showToast(t('published'));
+    showView('profile');
+  } catch (err) {
+    showToast('Xatolik: ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ---------- Modal yordamchilari ---------- */
+function closeModal(modalEl) { modalEl.classList.remove('open'); }
+
+function confirmDialog(message, onConfirm) {
+  qs('confirm-message').textContent = message;
+  confirmCallback = onConfirm;
+  qs('modal-confirm').classList.add('open');
 }
 
 /* ---------- Ishga tushirish ---------- */
-function init() {
+async function init() {
   state.lang = readJson(LANG_KEY, 'uz') === 'ru' ? 'ru' : 'uz';
+  await loadListings();
   applyLang();
 
   qs('lang-btn').addEventListener('click', toggleLang);
@@ -514,7 +823,7 @@ function init() {
 
   qs('f-region').addEventListener('change', (e) => {
     state.region = e.target.value;
-    state.district = '';          /* hudud o'zgarsa tuman tanlovi tushadi */
+    state.district = '';
     buildFilters();
     renderAll();
   });
@@ -536,6 +845,55 @@ function init() {
     qs(id).addEventListener('change', () => setErr(id, ''));
   });
 
+  qs('a-photos').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 6) {
+      showToast(t('photoTooMany'));
+      selectedPhotoFiles = files.slice(0, 6);
+    } else {
+      selectedPhotoFiles = files;
+    }
+    renderPhotoPreview();
+  });
+
+  /* --- akkaunt --- */
+  document.querySelectorAll('[data-role-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => { state.authRole = btn.dataset.roleTab; renderAuthForm(); });
+  });
+  qs('auth-form').addEventListener('submit', handleAuthSubmit);
+  AUTH_FIELD_IDS.forEach((id) => {
+    qs(id).addEventListener('input', () => setErr(id, ''));
+    qs(id).addEventListener('change', () => setErr(id, ''));
+  });
+
+  /* --- boshqaruv paneliga maxfiy kirish --- */
+  document.querySelector('.brand-mark').addEventListener('click', handleLogoTap);
+  qs('admin-exit').addEventListener('click', exitAdmin);
+  qs('pin-cancel').addEventListener('click', () => closeModal(qs('modal-pin')));
+  qs('pin-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = qs('pin-form').querySelector('button[type="submit"]');
+    btn.disabled = true;
+    try {
+      await Api.adminLogin(qs('pin').value.trim());
+      setErr('pin', '');
+      closeModal(qs('modal-pin'));
+      showView('admin');
+      showToast(t('adminOpened'));
+    } catch (err) {
+      setErr('pin', t('pinWrong'));
+      qs('pin').value = '';
+    } finally {
+      btn.disabled = false;
+    }
+  });
+  qs('pin').addEventListener('input', () => setErr('pin', ''));
+
+  if (location.hash === '#admin') requestAdmin();
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#admin') requestAdmin();
+  });
+
   document.querySelectorAll('[data-close-modal]').forEach((btn) => {
     btn.addEventListener('click', () => btn.closest('.modal').classList.remove('open'));
   });
@@ -546,11 +904,28 @@ function init() {
     if (e.key === 'Escape') document.querySelectorAll('.modal.open').forEach((m) => m.classList.remove('open'));
   });
 
+  qs('confirm-cancel').addEventListener('click', () => {
+    confirmCallback = null;
+    closeModal(qs('modal-confirm'));
+  });
+  qs('confirm-ok').addEventListener('click', () => {
+    const cb = confirmCallback;
+    confirmCallback = null;
+    closeModal(qs('modal-confirm'));
+    if (cb) cb();
+  });
+
   document.addEventListener('click', (e) => {
     const el = e.target.closest('[data-action]');
     if (!el) return;
     if (el.dataset.action === 'fav') { e.stopPropagation(); toggleFav(el.dataset.id); return; }
     if (el.dataset.action === 'open') openDetail(el.dataset.id);
+    if (el.dataset.action === 'open-auth') openAuthModal(el.dataset.role);
+    if (el.dataset.action === 'logout') logout();
+    if (el.dataset.action === 'go-admin') showView('admin');
+    if (el.dataset.action === 'delete-listing') deleteListing(el.dataset.id);
+    if (el.dataset.action === 'approve-listing') setListingStatus(el.dataset.id, 'approved');
+    if (el.dataset.action === 'reject-listing') setListingStatus(el.dataset.id, 'rejected');
   });
 }
 
