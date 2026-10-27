@@ -873,7 +873,10 @@ async function renderProfile() {
 
     <div class="profile-block">
       <h4>${esc(t('currentPlan'))}</h4>
-      <p><b>${esc(plan.name)}</b> ${plan.price ? '· ' + plan.price.toLocaleString('ru-RU') + " so'm/oy" : ''}</p>
+      <div class="plan-badge-row">
+        <span class="plan-badge plan-badge-${esc(plan.key)}">${esc(planName(plan))}</span>
+        ${plan.price ? `<span class="muted">${plan.price.toLocaleString('ru-RU')} so'm/oy</span>` : ''}
+      </div>
       <p class="muted">${esc(t('planExpiresLabel'))}: ${esc(expiresText)}</p>
       <p class="muted" id="profile-limits">...</p>
       <button type="button" class="link-btn" data-action="go-plans">${esc(t('upgradeBtn'))}</button>
