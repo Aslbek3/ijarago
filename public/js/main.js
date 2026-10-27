@@ -298,18 +298,16 @@ function initials(name) {
   return String(name || '').split(' ').map((p) => p[0]).slice(0, 2).join('').toUpperCase();
 }
 
-/* Birinchi rasm bo'lsa shuni, bo'lmasa rangli placeholder ko'rsatadi */
-function photoBlockHtml(item, size) {
+/* Birinchi rasm bo'lsa <img loading="lazy">, bo'lmasa rangli placeholder qaytaradi.
+   Rasm — haqiqiy <img> tegi, shuning uchun brauzer uni ko'rinish maydoniga
+   yetib kelgandagina yuklaydi (lazy-load). */
+function photoInnerHtml(item, size) {
   if (item.photos && item.photos.length) {
     const url = Api.photoUrl(item, item.photos[0], size === 'big' ? '800x600' : '400x300');
-    return `style="background-image:url('${esc(url)}');background-size:cover;background-position:center"`;
+    return `<img class="listing-img" src="${esc(url)}" alt="" loading="lazy" decoding="async">`;
   }
   const p = photoStyle(item.id);
-  return `style="background:${p.bg}"`;
-}
-function photoIconHtml(item) {
-  if (item.photos && item.photos.length) return '';
-  return `<span>${photoStyle(item.id).icon}</span>`;
+  return `<div class="listing-photo-fallback" style="background:${p.bg}"><span>${p.icon}</span></div>`;
 }
 
 function showToast(message) {
@@ -411,25 +409,46 @@ function cardHtml(item) {
   const fav = getSaved().includes(item.id);
   return `
     <article class="listing" data-action="open" data-id="${esc(item.id)}">
-      <div class="listing-photo" ${photoBlockHtml(item)}>
-        ${photoIconHtml(item)}
+      <div class="listing-photo">
+        ${photoInnerHtml(item)}
         <span class="listing-badge">${esc(item.type === 'daily' ? t('daily') : t('long'))}</span>
         <button type="button" class="listing-fav" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
       </div>
       <div class="listing-body">
         <div class="listing-price">${esc(priceText(item))}</div>
         <div class="listing-title">${esc(titleOf(item))}</div>
-        <div class="listing-meta">${esc(locText(item))} · ${esc(item.rooms)} ${esc(t('rooms'))} · ${esc(item.area || 0)} m²</div>
+        <div class="listing-meta-row">
+          <span class="meta-chip">📍 ${esc(locText(item))}</span>
+          <span class="meta-chip">${esc(item.rooms)} ${esc(t('rooms'))}</span>
+          <span class="meta-chip">${esc(item.area || 0)} m²</span>
+        </div>
       </div>
     </article>
   `;
+}
+
+function emptyStateHtml(icon, text) {
+  return `<div class="empty-state"><span class="empty-icon">${icon}</span><span class="empty-text">${esc(text)}</span></div>`;
+}
+
+function skeletonCardsHtml(count) {
+  return Array.from({ length: count }).map(() => `
+    <div class="listing skeleton-card">
+      <div class="listing-photo skeleton-shimmer"></div>
+      <div class="listing-body">
+        <div class="skeleton-line skeleton-shimmer" style="width:45%;height:20px"></div>
+        <div class="skeleton-line skeleton-shimmer" style="width:75%;height:14px;margin-top:8px"></div>
+        <div class="skeleton-line skeleton-shimmer" style="width:55%;height:12px;margin-top:8px"></div>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderHome() {
   const list = filtered();
   qs('listing-list').innerHTML = list.length
     ? list.map(cardHtml).join('')
-    : `<div class="empty-state">${esc(t('noResults'))}</div>`;
+    : emptyStateHtml('🏠', t('noResults'));
   qs('home-count').textContent = list.length + ' ' + t('countSuffix');
 }
 
@@ -438,7 +457,7 @@ function renderSaved() {
   const list = listingsCache.filter((item) => ids.includes(item.id));
   qs('saved-list').innerHTML = list.length
     ? list.map(cardHtml).join('')
-    : `<div class="empty-state">${esc(t('noSaved'))}</div>`;
+    : emptyStateHtml('♡', t('noSaved'));
   qs('saved-count').textContent = list.length + ' ' + t('countSuffix');
 }
 
@@ -451,7 +470,7 @@ function renderAll() {
 /* ---------- Xarita ---------- */
 function renderMap() {
   if (typeof L === 'undefined') {
-    qs('map').innerHTML = `<div class="empty-state">${esc(t('mapOffline'))}</div>`;
+    qs('map').innerHTML = emptyStateHtml('🗺️', t('mapOffline'));
     return;
   }
   if (!map) {
@@ -487,9 +506,11 @@ function openDetail(id, fromHash) {
   const fav = getSaved().includes(item.id);
 
   qs('detail-content').innerHTML = `
-    <div class="detail-photo" ${photoBlockHtml(item, 'big')}>
+    <div class="detail-photo">
+      ${item.photos && item.photos.length
+        ? `<img class="listing-img" src="${esc(Api.photoUrl(item, item.photos[0], '800x600'))}" alt="" loading="lazy" decoding="async">`
+        : `<span class="photo-glyph">${photoStyle(item.id).icon}</span>`}
       <span class="detail-photo-badge">${esc(item.type === 'daily' ? t('daily') : t('long'))}</span>
-      ${item.photos && item.photos.length ? '' : `<span class="photo-glyph">${photoStyle(item.id).icon}</span>`}
     </div>
     <div class="detail-head-row">
       <div>
@@ -782,7 +803,7 @@ async function renderAdmin() {
   try {
     items = await Api.listAllForAdmin();
   } catch (e) {
-    qs('admin-list').innerHTML = `<div class="empty-state">${esc(t('loadError'))}</div>`;
+    qs('admin-list').innerHTML = emptyStateHtml('⚠️', t('loadError'));
     return;
   }
 
@@ -809,7 +830,7 @@ async function renderAdmin() {
         <button type="button" class="btn btn-danger" data-action="reject-listing" data-id="${esc(item.id)}">${esc(t('adminReject'))}</button>
       </div>
     </div>
-  `).join('') : `<div class="empty-state">${esc(t('adminEmpty'))}</div>`;
+  `).join('') : emptyStateHtml('📋', t('adminEmpty'));
 }
 
 async function setListingStatus(id, status, note) {
@@ -938,6 +959,7 @@ function confirmDialog(message, onConfirm) {
 /* ---------- Ishga tushirish ---------- */
 async function init() {
   state.lang = readJson(LANG_KEY, 'uz') === 'ru' ? 'ru' : 'uz';
+  qs('listing-list').innerHTML = skeletonCardsHtml(4);
   await loadListings();
   applyLang();
 
