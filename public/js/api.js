@@ -211,10 +211,91 @@ const Api = (() => {
     return `/api/files/${record.collectionId}/${record.id}/${filename}${q}`;
   }
 
+  /* ---------- to'lov so'rovlari (tarif / ko'tarish / VIP) ----------
+     DIQQAT: to'lov avtomatik tekshirilmaydi. Foydalanuvchi "To'lovni
+     amalga oshirdim" deganda shu yerga "pending" yozuv tushadi — admin
+     uni qo'lda ko'rib, tasdiqlagandan keyingina tarif/VIP/ko'tarish
+     kuchga kiradi. */
+  async function createPaymentRequest({ type, planKey, listingId, amount }) {
+    const session = getUserSession();
+    if (!session) throw new Error('Avval akkauntga kiring');
+    return request('/api/collections/payment_requests/records', {
+      method: 'POST',
+      token: session.token,
+      body: {
+        account: session.record.id,
+        type,
+        planKey: planKey || '',
+        listing: listingId || '',
+        amount,
+        status: 'pending',
+      },
+    });
+  }
+
+  async function listMyPaymentRequests() {
+    const session = getUserSession();
+    if (!session) return [];
+    const data = await request(
+      `/api/collections/payment_requests/records?perPage=100&sort=-created&filter=${encodeURIComponent(`account="${session.record.id}"`)}`,
+      { token: session.token },
+    );
+    return data.items;
+  }
+
+  async function listAllPaymentRequests() {
+    const admin = getAdminSession();
+    if (!admin) return [];
+    const data = await request('/api/collections/payment_requests/records?perPage=200&sort=-created&filter=' + encodeURIComponent('status="pending"'), {
+      token: admin.token,
+    });
+    return data.items;
+  }
+
+  /* So'rovni tasdiqlab, turiga qarab tegishli yozuvni yangilaydi
+     (tarif -> users.plan/planExpires, ko'tarish -> listings.boostedAt,
+     VIP -> listings.vip). Hammasi admin (superuser) tokeni bilan. */
+  async function approvePaymentRequest(reqRecord, { planDays = 30 } = {}) {
+    const admin = getAdminSession();
+    if (!admin) throw new Error('Avval admin sifatida kiring');
+
+    if (reqRecord.type === 'plan' && reqRecord.planKey) {
+      const expires = new Date(Date.now() + planDays * 86400000).toISOString();
+      await request(`/api/collections/users/records/${reqRecord.account}`, {
+        method: 'PATCH', token: admin.token,
+        body: { plan: reqRecord.planKey, planExpires: expires },
+      });
+    } else if (reqRecord.type === 'boost' && reqRecord.listing) {
+      await request(`/api/collections/listings/records/${reqRecord.listing}`, {
+        method: 'PATCH', token: admin.token,
+        body: { boostedAt: new Date().toISOString() },
+      });
+    } else if (reqRecord.type === 'vip' && reqRecord.listing) {
+      await request(`/api/collections/listings/records/${reqRecord.listing}`, {
+        method: 'PATCH', token: admin.token,
+        body: { vip: true },
+      });
+    }
+
+    return request(`/api/collections/payment_requests/records/${reqRecord.id}`, {
+      method: 'PATCH', token: admin.token, body: { status: 'approved' },
+    });
+  }
+
+  async function rejectPaymentRequest(id, note) {
+    const admin = getAdminSession();
+    if (!admin) throw new Error('Avval admin sifatida kiring');
+    return request(`/api/collections/payment_requests/records/${id}`, {
+      method: 'PATCH', token: admin.token, body: { status: 'rejected', note: note || '' },
+    });
+  }
+
   return {
     currentUser, getUserSession, authenticateAccount, logoutUser,
     isAdminUnlocked, adminLogin, adminLogout,
     listApproved, listMine, listAllForAdmin, getListing,
     createListing, updateListing, updateListingStatus, deleteListing, photoUrl,
+    createPaymentRequest, listMyPaymentRequests, listAllPaymentRequests,
+    approvePaymentRequest, rejectPaymentRequest,
   };
 })();

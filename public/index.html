@@ -146,6 +146,16 @@
       <div id="profile-view"></div>
     </section>
 
+    <!-- TARIFLAR -->
+    <section id="view-plans" class="view">
+      <div class="section-head">
+        <h2 data-i18n="plansTitle">Tariflar</h2>
+        <button type="button" class="link-btn" data-action="go-profile" data-i18n="back">Orqaga</button>
+      </div>
+      <p class="note" data-i18n="plansNote">To'lov qo'lda tekshiriladi — "To'lovni amalga oshirdim" tugmasini bossangiz, so'rovingiz administratorga yuboriladi.</p>
+      <div id="plans-list"></div>
+    </section>
+
     <!-- BOSHQARUV PANELI (ADMIN) -->
     <section id="view-admin" class="view">
       <div class="section-head">
@@ -153,6 +163,16 @@
         <button type="button" class="link-btn" id="admin-exit" data-i18n="adminExit">Chiqish</button>
       </div>
       <p class="note">Bu panel haqiqiy server (PocketBase) orqali himoyalangan.</p>
+
+      <div class="section-head">
+        <h2 data-i18n="adminPaymentsTitle">To'lov so'rovlari</h2>
+        <span class="section-note" id="admin-payments-count"></span>
+      </div>
+      <div id="admin-payments-list"></div>
+
+      <div class="section-head" style="margin-top:var(--space-6)">
+        <h2 data-i18n="adminListingsTitle">E'lonlar moderatsiyasi</h2>
+      </div>
       <div id="admin-stats" class="admin-stats"></div>
       <div id="admin-list" class="card-list"></div>
     </section>
@@ -230,6 +250,14 @@
       <button class="btn btn-secondary" id="confirm-cancel" data-i18n="cancel">Bekor qilish</button>
       <button class="btn btn-danger" id="confirm-ok" data-i18n="ok">Tasdiqlash</button>
     </div>
+  </div>
+</div>
+
+<!-- TO'LOV / OBUNA OYNASI -->
+<div class="modal" id="modal-payment">
+  <div class="sheet">
+    <button class="close" data-close-modal>×</button>
+    <div id="payment-content"></div>
   </div>
 </div>
 

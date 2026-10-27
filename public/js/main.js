@@ -70,6 +70,24 @@ const I18N = {
     adminEmpty: "Hali e'lon yo'q.", adminOpened: 'Boshqaruv paneli ochildi',
     statTotal: 'Jami', statPending: 'Kutilmoqda', statApproved: 'Tasdiqlangan', statRejected: 'Rad etilgan',
     photoTooMany: "Ko'pi bilan 6 ta rasm yuklash mumkin",
+
+    plansTitle: 'Tariflar', back: 'Orqaga',
+    plansNote: 'To‘lov qo‘lda tekshiriladi — "To‘lovni amalga oshirdim" tugmasini bossangiz, so‘rovingiz administratorga yuboriladi.',
+    adminPaymentsTitle: "To'lov so'rovlari", adminListingsTitle: "E'lonlar moderatsiyasi",
+    popularTag: 'Mashhur', freeTag: 'Bepul', perMonthShort: 'oy',
+    chooseBtn: 'Tanlash', currentPlanBtn: 'Joriy tarifingiz', planSuffix: 'obuna',
+    payCopy: 'Nusxalash', payCopied: 'Karta raqami nusxalandi',
+    payConfirmBtn: "To'lovni amalga oshirdim",
+    payPending: "So'rovingiz ko'rib chiqilmoqda — admin tasdiqlagach kuchga kiradi.",
+    requestSent: "So'rov yuborildi",
+    boostBtn: "Ko'tarish 5 000 so'm", vipBtn: 'VIP 20 000 so‘m',
+    boostTitle: "E'lonni ko'tarish", vipTitle: 'VIP belgisi',
+    currentPlan: 'Joriy tarif', planExpiresLabel: 'Tugash sanasi', noExpiry: "Belgilanmagan",
+    remainingListings: "Qolgan e'lon limiti", remainingBoosts: "Oylik ko'tarish limiti",
+    upgradeBtn: 'Tariflarni ko‘rish →',
+    paymentTypePlan: 'Tarif', paymentTypeBoost: "E'lonni ko'tarish", paymentTypeVip: 'VIP belgisi',
+    adminPaymentsEmpty: "Hozircha to'lov so'rovi yo'q.", approved: 'Tasdiqlandi',
+    rejectPaymentConfirm: "So'rovni rad etmoqchimisiz?",
   },
   ru: {
     tagline: 'Найти жильё просто',
@@ -137,6 +155,24 @@ const I18N = {
     adminEmpty: 'Пока нет объявлений.', adminOpened: 'Панель управления открыта',
     statTotal: 'Всего', statPending: 'На проверке', statApproved: 'Одобрено', statRejected: 'Отклонено',
     photoTooMany: 'Можно загрузить максимум 6 фото',
+
+    plansTitle: 'Тарифы', back: 'Назад',
+    plansNote: 'Оплата проверяется вручную — после нажатия "Я оплатил" запрос отправится администратору.',
+    adminPaymentsTitle: 'Запросы на оплату', adminListingsTitle: 'Модерация объявлений',
+    popularTag: 'Популярный', freeTag: 'Бесплатно', perMonthShort: 'мес',
+    chooseBtn: 'Выбрать', currentPlanBtn: 'Ваш текущий тариф', planSuffix: 'подписка',
+    payCopy: 'Скопировать', payCopied: 'Номер карты скопирован',
+    payConfirmBtn: 'Я оплатил',
+    payPending: 'Ваш запрос на рассмотрении — вступит в силу после подтверждения администратором.',
+    requestSent: 'Запрос отправлен',
+    boostBtn: 'Поднять 5 000 сум', vipBtn: 'VIP 20 000 сум',
+    boostTitle: 'Поднять объявление', vipTitle: 'VIP-метка',
+    currentPlan: 'Текущий тариф', planExpiresLabel: 'Дата окончания', noExpiry: 'Не указана',
+    remainingListings: 'Лимит объявлений', remainingBoosts: 'Лимит поднятий в месяц',
+    upgradeBtn: 'Смотреть тарифы →',
+    paymentTypePlan: 'Тариф', paymentTypeBoost: 'Поднятие объявления', paymentTypeVip: 'VIP-метка',
+    adminPaymentsEmpty: 'Пока нет запросов на оплату.', approved: 'Подтверждено',
+    rejectPaymentConfirm: 'Отклонить запрос?',
   },
 };
 
@@ -190,6 +226,97 @@ const AVATAR_COLORS = ['#17634f', '#2a9d8f', '#2b7a9b', '#5e60ce', '#c9811b', '#
 
 const STATUS_LABEL_KEY = { pending: 'statusPending', approved: 'statusApproved', rejected: 'statusRejected' };
 const LOGO_TAPS_NEEDED = 5;
+
+/* ---------- Tariflar (ko'rinish uchun — to'lov qo'lda tekshiriladi) ----------
+   Raqamlar (limit, narx) — namuna, keyinroq osongina o'zgartirish mumkin. */
+const DEMO_CARD = { number: '8600 1234 5678 9012', holder: 'IJARAGO DEMO' };
+
+const PLANS = [
+  {
+    key: 'free', price: 0, popular: false, listingsLimit: 1, boostsPerMonth: 0, vipIncluded: 0,
+    name: { uz: 'Bepul', ru: 'Бесплатно' },
+    features: {
+      uz: [
+        { text: "1 ta faol e'lon", on: true },
+        { text: 'Asosiy qidiruvda ko‘rinish', on: true },
+        { text: "Ko'tarish imkoniyati", on: false },
+        { text: 'VIP belgi', on: false },
+        { text: "Ustuvor qo'llab-quvvatlash", on: false },
+      ],
+      ru: [
+        { text: '1 активное объявление', on: true },
+        { text: 'Видимость в обычном поиске', on: true },
+        { text: 'Поднятие объявления', on: false },
+        { text: 'VIP-метка', on: false },
+        { text: 'Приоритетная поддержка', on: false },
+      ],
+    },
+  },
+  {
+    key: 'start', price: 99000, popular: false, listingsLimit: 5, boostsPerMonth: 2, vipIncluded: 0,
+    name: { uz: 'Start', ru: 'Старт' },
+    features: {
+      uz: [
+        { text: "5 ta faol e'lon", on: true },
+        { text: "Oyiga 2 ta bepul ko'tarish", on: true },
+        { text: 'Asosiy qidiruvda ko‘rinish', on: true },
+        { text: 'VIP belgi', on: false },
+        { text: "Ustuvor qo'llab-quvvatlash", on: false },
+      ],
+      ru: [
+        { text: '5 активных объявлений', on: true },
+        { text: '2 бесплатных поднятия в месяц', on: true },
+        { text: 'Видимость в обычном поиске', on: true },
+        { text: 'VIP-метка', on: false },
+        { text: 'Приоритетная поддержка', on: false },
+      ],
+    },
+  },
+  {
+    key: 'pro', price: 199000, popular: true, listingsLimit: 15, boostsPerMonth: 10, vipIncluded: 1,
+    name: { uz: 'Pro', ru: 'Про' },
+    features: {
+      uz: [
+        { text: "15 ta faol e'lon", on: true },
+        { text: "Oyiga 10 ta bepul ko'tarish", on: true },
+        { text: '1 ta VIP belgi', on: true },
+        { text: 'Qidiruvda yuqorida chiqish', on: true },
+        { text: "Ustuvor qo'llab-quvvatlash", on: true },
+      ],
+      ru: [
+        { text: '15 активных объявлений', on: true },
+        { text: '10 бесплатных поднятий в месяц', on: true },
+        { text: '1 VIP-метка', on: true },
+        { text: 'Показ выше в поиске', on: true },
+        { text: 'Приоритетная поддержка', on: true },
+      ],
+    },
+  },
+  {
+    key: 'agency', price: 499000, popular: false, listingsLimit: 50, boostsPerMonth: 999, vipIncluded: 5,
+    name: { uz: 'Agentlik', ru: 'Агентство' },
+    features: {
+      uz: [
+        { text: "50 ta faol e'lon", on: true },
+        { text: "Cheksiz ko'tarish", on: true },
+        { text: '5 ta VIP belgi', on: true },
+        { text: 'Qidiruvda eng yuqorida', on: true },
+        { text: 'Shaxsiy menejer', on: true },
+      ],
+      ru: [
+        { text: '50 активных объявлений', on: true },
+        { text: 'Неограниченные поднятия', on: true },
+        { text: '5 VIP-меток', on: true },
+        { text: 'Показ в самом верху поиска', on: true },
+        { text: 'Персональный менеджер', on: true },
+      ],
+    },
+  },
+];
+
+function planByKey(key) { return PLANS.find((p) => p.key === key) || PLANS[0]; }
+function planName(plan) { return plan.name[state.lang] || plan.name.uz; }
+function planFeatures(plan) { return plan.features[state.lang] || plan.features.uz; }
 
 /* ---------- Holat ---------- */
 const LANG_KEY = 'ijarago_lang';
@@ -310,6 +437,13 @@ function photoInnerHtml(item, size) {
   return `<div class="listing-photo-fallback" style="background:${p.bg}"><span>${p.icon}</span></div>`;
 }
 
+function formatDateShort(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return '—';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+}
+
 function showToast(message) {
   const el = qs('toast');
   el.textContent = message;
@@ -388,7 +522,7 @@ function buildAddDistricts(selected) {
 /* ---------- Filtrlash ---------- */
 function filtered() {
   const q = state.query.trim().toLowerCase();
-  return listingsCache.filter((item) => {
+  const list = listingsCache.filter((item) => {
     if (state.type !== 'all' && item.type !== state.type) return false;
     if (state.region && item.region !== state.region) return false;
     if (state.district && item.district !== state.district) return false;
@@ -402,15 +536,18 @@ function filtered() {
     }
     return true;
   });
+  /* VIP e'lonlar ro'yxat boshida (tartib ichida esa -created saqlanadi) */
+  return [...list].sort((a, b) => (b.vip ? 1 : 0) - (a.vip ? 1 : 0));
 }
 
 /* ---------- Chizish ---------- */
 function cardHtml(item) {
   const fav = getSaved().includes(item.id);
   return `
-    <article class="listing" data-action="open" data-id="${esc(item.id)}">
+    <article class="listing${item.vip ? ' is-vip' : ''}" data-action="open" data-id="${esc(item.id)}">
       <div class="listing-photo">
         ${photoInnerHtml(item)}
+        ${item.vip ? `<span class="vip-badge">⭐ VIP</span>` : ''}
         <span class="listing-badge">${esc(item.type === 'daily' ? t('daily') : t('long'))}</span>
         <button type="button" class="listing-fav" data-action="fav" data-id="${esc(item.id)}">${fav ? '♥' : '♡'}</button>
       </div>
@@ -628,6 +765,7 @@ function showView(name) {
   if (name === 'saved') renderSaved();
   if (name === 'profile') renderProfile();
   if (name === 'admin') renderAdmin();
+  if (name === 'plans') renderPlans();
 }
 
 /* ---------- Kirish / ro'yxatdan o'tish ---------- */
@@ -719,6 +857,9 @@ async function renderProfile() {
     return;
   }
 
+  const plan = planByKey(acc.plan || 'free');
+  const expiresText = acc.planExpires ? formatDateShort(acc.planExpires) : t('noExpiry');
+
   box.innerHTML = `
     <div class="profile-card">
       <div class="avatar" style="background:${avatarColor(acc.id)}">${esc(initials(acc.name))}</div>
@@ -728,6 +869,15 @@ async function renderProfile() {
         <span class="role-badge">${acc.role === 'realtor' ? esc(t('roleRealtor')) : esc(t('roleOwner'))}</span>
       </div>
     </div>
+
+    <div class="profile-block">
+      <h4>${esc(t('currentPlan'))}</h4>
+      <p><b>${esc(plan.name)}</b> ${plan.price ? '· ' + plan.price.toLocaleString('ru-RU') + " so'm/oy" : ''}</p>
+      <p class="muted">${esc(t('planExpiresLabel'))}: ${esc(expiresText)}</p>
+      <p class="muted" id="profile-limits">...</p>
+      <button type="button" class="link-btn" data-action="go-plans">${esc(t('upgradeBtn'))}</button>
+    </div>
+
     <div class="profile-block">
       <h4>${esc(t('myListings'))}</h4>
       <div id="my-listings-list"></div>
@@ -741,14 +891,26 @@ async function renderProfile() {
   try {
     const mine = await Api.listMine();
     myListingsCache = mine;
+
+    const limitsEl = qs('profile-limits');
+    if (limitsEl) {
+      const remainingListings = Math.max(0, plan.listingsLimit - mine.length);
+      limitsEl.textContent = `${t('remainingListings')}: ${remainingListings} / ${plan.listingsLimit} · ${t('remainingBoosts')}: ${plan.boostsPerMonth >= 999 ? '∞' : plan.boostsPerMonth}`;
+    }
+
     mineBox.innerHTML = mine.length ? mine.map((item) => `
-      <div class="admin-listing-card">
+      <div class="admin-listing-card${item.vip ? ' is-vip' : ''}">
         <div class="admin-listing-top">
           <b>${esc(titleOf(item) || t('listings'))}</b>
           <span class="badge badge-${esc(item.status)}">${esc(t(STATUS_LABEL_KEY[item.status] || 'statusPending'))}</span>
         </div>
         <div class="admin-listing-meta">${esc(locText(item))} · ${esc(priceText(item))}</div>
+        ${item.vip ? `<div class="admin-listing-meta">⭐ VIP</div>` : ''}
         ${item.note ? `<div class="admin-listing-meta">${esc(item.note)}</div>` : ''}
+        <div class="listing-boost-row">
+          <button type="button" class="btn btn-outline" data-action="boost-listing" data-id="${esc(item.id)}">${esc(t('boostBtn'))}</button>
+          <button type="button" class="btn btn-outline" data-action="vip-listing" data-id="${esc(item.id)}">${esc(t('vipBtn'))}</button>
+        </div>
         <button type="button" class="edit-btn" data-action="edit-listing" data-id="${esc(item.id)}">${esc(t('editListing'))}</button>
         <button type="button" class="remove-btn" data-action="delete-listing" data-id="${esc(item.id)}">${esc(t('deleteListing'))}</button>
       </div>
@@ -770,6 +932,74 @@ function deleteListing(id) {
       showToast('Xatolik: ' + e.message);
     }
   });
+}
+
+/* ---------- Tariflar ---------- */
+function planFeaturesHtml(plan) {
+  return planFeatures(plan).map((f) => `
+    <li class="${f.on ? '' : 'off'}"><span class="plan-check">${f.on ? '✓' : '✕'}</span><span>${esc(f.text)}</span></li>
+  `).join('');
+}
+
+function renderPlans() {
+  const acc = Api.currentUser();
+  qs('plans-list').innerHTML = PLANS.map((plan) => `
+    <div class="plan-card${plan.popular ? ' popular' : ''}">
+      ${plan.popular ? `<span class="plan-popular-tag">${esc(t('popularTag'))}</span>` : ''}
+      <div class="plan-name">${esc(planName(plan))}</div>
+      <div class="plan-price">${plan.price ? plan.price.toLocaleString('ru-RU') + " so'm" : esc(t('freeTag'))}${plan.price ? ` <small>/ ${esc(t('perMonthShort'))}</small>` : ''}</div>
+      <ul class="plan-features">${planFeaturesHtml(plan)}</ul>
+      ${plan.key === 'free'
+        ? ''
+        : `<button type="button" class="btn btn-primary btn-block" data-action="buy-plan" data-key="${plan.key}">${acc && acc.plan === plan.key ? esc(t('currentPlanBtn')) : esc(t('chooseBtn'))}</button>`}
+    </div>
+  `).join('');
+}
+
+/* ---------- To'lov oynasi (tarif / ko'tarish / VIP uchun umumiy) ----------
+   DIQQAT: to'lov avtomatik tekshirilmaydi. "To'lovni amalga oshirdim"
+   bosilganda faqat so'rov yuboriladi — admin uni qo'lda tasdiqlaydi. */
+let paymentContext = null;
+
+function openPaymentModal({ title, price, type, planKey, listingId }) {
+  if (!Api.currentUser()) { showToast(t('loginFirst')); showView('profile'); return; }
+  paymentContext = { type, planKey, listingId, amount: price };
+  qs('payment-content').innerHTML = `
+    <h3>${esc(title)}</h3>
+    <div class="pay-plan-price">${Number(price).toLocaleString('ru-RU')} so'm</div>
+    <div class="pay-card-box">
+      <span class="pay-demo-tag">DEMO</span>
+      <div class="pay-card-number">${esc(DEMO_CARD.number)}</div>
+      <div class="pay-card-holder">${esc(DEMO_CARD.holder)}</div>
+      <button type="button" class="pay-copy-btn" data-action="pay-copy">${esc(t('payCopy'))}</button>
+    </div>
+    <button type="button" class="btn btn-primary btn-block" data-action="pay-confirm">${esc(t('payConfirmBtn'))}</button>
+    <div id="pay-status-box"></div>
+  `;
+  qs('modal-payment').classList.add('open');
+}
+
+function handlePayCopy() {
+  const text = DEMO_CARD.number.replace(/\s/g, '');
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast(t('payCopied'))).catch(() => showToast(DEMO_CARD.number));
+  } else {
+    showToast(DEMO_CARD.number);
+  }
+}
+
+async function handlePayConfirm(btn) {
+  if (!paymentContext) return;
+  btn.disabled = true;
+  try {
+    await Api.createPaymentRequest(paymentContext);
+    qs('pay-status-box').innerHTML = `<div class="pay-status">${esc(t('payPending'))}</div>`;
+    btn.style.display = 'none';
+    showToast(t('requestSent'));
+  } catch (e) {
+    showToast('Xatolik: ' + e.message);
+    btn.disabled = false;
+  }
 }
 
 /* ---------- Boshqaruv paneli (admin) ---------- */
@@ -798,7 +1028,67 @@ function handleLogoTap() {
   }
 }
 
+let adminPaymentsCache = [];
+
+function paymentTypeLabel(r) {
+  if (r.type === 'plan') return t('paymentTypePlan') + ': ' + planName(planByKey(r.planKey));
+  if (r.type === 'boost') return t('paymentTypeBoost');
+  if (r.type === 'vip') return t('paymentTypeVip');
+  return r.type;
+}
+
+async function renderAdminPayments() {
+  let items = [];
+  try {
+    items = await Api.listAllPaymentRequests();
+  } catch (e) {
+    qs('admin-payments-list').innerHTML = emptyStateHtml('⚠️', t('loadError'));
+    return;
+  }
+  adminPaymentsCache = items;
+  qs('admin-payments-count').textContent = items.length ? items.length + ' ' + t('countSuffix') : '';
+  qs('admin-payments-list').innerHTML = items.length ? items.map((r) => `
+    <div class="admin-listing-card">
+      <div class="admin-listing-top">
+        <b>${esc(paymentTypeLabel(r))}</b>
+        <span class="muted">${Number(r.amount).toLocaleString('ru-RU')} so'm</span>
+      </div>
+      <div class="admin-listing-meta">${esc(formatDateShort(r.created))}</div>
+      <div class="admin-listing-actions">
+        <button type="button" class="btn btn-primary" data-action="approve-payment" data-id="${esc(r.id)}">${esc(t('adminApprove'))}</button>
+        <button type="button" class="btn btn-danger" data-action="reject-payment" data-id="${esc(r.id)}">${esc(t('adminReject'))}</button>
+      </div>
+    </div>
+  `).join('') : emptyStateHtml('💳', t('adminPaymentsEmpty'));
+}
+
+async function approvePayment(id) {
+  const rec = adminPaymentsCache.find((x) => x.id === id);
+  if (!rec) return;
+  try {
+    await Api.approvePaymentRequest(rec);
+    showToast(t('approved'));
+    renderAdminPayments();
+    await loadListings();
+    renderAll();
+  } catch (e) {
+    showToast('Xatolik: ' + e.message);
+  }
+}
+
+function rejectPayment(id) {
+  confirmDialog(t('rejectPaymentConfirm'), async () => {
+    try {
+      await Api.rejectPaymentRequest(id);
+      renderAdminPayments();
+    } catch (e) {
+      showToast('Xatolik: ' + e.message);
+    }
+  });
+}
+
 async function renderAdmin() {
+  renderAdminPayments();
   let items = [];
   try {
     items = await Api.listAllForAdmin();
@@ -1106,6 +1396,22 @@ async function init() {
       const note = document.querySelector(`.admin-note-input[data-id="${el.dataset.id}"]`);
       setListingStatus(el.dataset.id, 'rejected', note ? note.value.trim() : '');
     }
+    if (el.dataset.action === 'go-plans') showView('plans');
+    if (el.dataset.action === 'go-profile') showView('profile');
+    if (el.dataset.action === 'buy-plan') {
+      const plan = planByKey(el.dataset.key);
+      openPaymentModal({ title: planName(plan) + ' — ' + t('planSuffix'), price: plan.price, type: 'plan', planKey: plan.key });
+    }
+    if (el.dataset.action === 'boost-listing') {
+      openPaymentModal({ title: t('boostTitle'), price: 5000, type: 'boost', listingId: el.dataset.id });
+    }
+    if (el.dataset.action === 'vip-listing') {
+      openPaymentModal({ title: t('vipTitle'), price: 20000, type: 'vip', listingId: el.dataset.id });
+    }
+    if (el.dataset.action === 'pay-copy') handlePayCopy();
+    if (el.dataset.action === 'pay-confirm') handlePayConfirm(el);
+    if (el.dataset.action === 'approve-payment') approvePayment(el.dataset.id);
+    if (el.dataset.action === 'reject-payment') rejectPayment(el.dataset.id);
   });
 }
 

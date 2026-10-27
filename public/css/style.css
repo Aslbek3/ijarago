@@ -585,6 +585,64 @@ button, input, select, textarea { font-family: inherit; font-size: var(--fs-md);
 }
 .admin-note-input:focus { border-color: var(--brand); }
 
+/* ---------- Tariflar ---------- */
+.plan-card {
+  position: relative; background: var(--card); border: 1.5px solid var(--border);
+  border-radius: var(--r-card); padding: var(--space-5); margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-xs);
+}
+.plan-card.popular { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.plan-popular-tag {
+  position: absolute; top: -12px; left: var(--space-4);
+  background: var(--brand); color: #fff; font-size: var(--fs-xs); font-weight: 700;
+  padding: var(--space-1) var(--space-3); border-radius: var(--r-pill);
+}
+.plan-name { font-size: var(--fs-lg); font-weight: 700; }
+.plan-price { font-size: var(--fs-2xl); font-weight: 800; color: var(--brand); margin-top: var(--space-1); }
+.plan-price small { font-size: var(--fs-sm); font-weight: 500; color: var(--text-2); }
+.plan-features { list-style: none; margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-2); }
+.plan-features li { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--fs-sm); }
+.plan-features li.off { color: var(--text-2); }
+.plan-check { flex: none; color: var(--brand); font-weight: 700; }
+.plan-features li.off .plan-check { color: var(--gray-400); }
+
+/* ---------- To'lov oynasi ---------- */
+.pay-plan-name { font-size: var(--fs-lg); font-weight: 700; }
+.pay-plan-price { font-size: var(--fs-2xl); font-weight: 800; color: var(--brand); margin-top: var(--space-1); }
+.pay-card-box {
+  margin-top: var(--space-5); background: var(--tile); border-radius: var(--r-tile);
+  padding: var(--space-4); text-align: center;
+}
+.pay-demo-tag {
+  display: inline-block; background: var(--warn-bg); color: var(--warn);
+  font-size: var(--fs-xs); font-weight: 700; padding: 2px var(--space-2);
+  border-radius: var(--radius-sm); margin-bottom: var(--space-2);
+}
+.pay-card-number { font-size: var(--fs-xl); font-weight: 700; letter-spacing: .05em; color: var(--text); }
+.pay-card-holder { font-size: var(--fs-sm); color: var(--text-2); margin-top: var(--space-1); }
+.pay-copy-btn {
+  margin-top: var(--space-3); min-height: var(--tap-min); border: 1.5px solid var(--brand); background: #fff;
+  color: var(--brand); border-radius: var(--r-btn); padding: 0 var(--space-4);
+  font-size: var(--fs-sm); font-weight: 600; cursor: pointer;
+}
+.pay-status {
+  margin-top: var(--space-4); text-align: center; padding: var(--space-4);
+  background: var(--warn-bg); color: var(--warn); border-radius: var(--r-tile); font-size: var(--fs-sm);
+}
+
+/* ---------- VIP ---------- */
+.listing.is-vip { border-color: #e0a53a; box-shadow: 0 0 0 1.5px #e0a53a inset; }
+.vip-badge {
+  position: absolute; top: var(--space-2); left: var(--space-2); z-index: 2;
+  background: linear-gradient(135deg,#f4c550,#e0a53a); color: #5c3d00;
+  font-size: var(--fs-xs); font-weight: 800; padding: var(--space-1) var(--space-3); border-radius: var(--r-pill);
+}
+.listing.is-vip .listing-badge { top: 38px; }
+
+/* ---------- Ko'tarish / VIP tugmalari (mening e'lonlarim) ---------- */
+.listing-boost-row { display: flex; gap: var(--space-2); margin-top: var(--space-2); }
+.listing-boost-row .btn { flex: 1; padding: 0 var(--space-2); font-size: var(--fs-xs); }
+
 /* ---------- Desktop ---------- */
 @media (min-width: 900px) {
   body { padding: var(--space-7) 0; }
