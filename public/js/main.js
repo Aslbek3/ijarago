@@ -834,6 +834,7 @@ function logout() {
 
 /* ---------- Profil ---------- */
 async function renderProfile() {
+  if (Api.currentUser()) await Api.refreshCurrentUser();
   const acc = Api.currentUser();
   const box = qs('profile-view');
 
@@ -941,7 +942,8 @@ function planFeaturesHtml(plan) {
   `).join('');
 }
 
-function renderPlans() {
+async function renderPlans() {
+  if (Api.currentUser()) await Api.refreshCurrentUser();
   const acc = Api.currentUser();
   qs('plans-list').innerHTML = PLANS.map((plan) => `
     <div class="plan-card${plan.popular ? ' popular' : ''}">

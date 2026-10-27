@@ -72,6 +72,22 @@ const Api = (() => {
     return s ? s.record : null;
   }
 
+  /* Admin tasdiqlagandan keyin (tarif/VIP) o'zgargan ma'lumot — masalan plan,
+     planExpires — brauzerda saqlangan eski nusxada qolib ketmasligi uchun
+     serverdan qayta so'raladi. Profil ochilganda chaqiriladi. */
+  async function refreshCurrentUser() {
+    const session = getUserSession();
+    if (!session) return null;
+    try {
+      const fresh = await request(`/api/collections/users/records/${session.record.id}`, { token: session.token });
+      session.record = fresh;
+      setUserSession(session);
+      return fresh;
+    } catch (e) {
+      return session.record;
+    }
+  }
+
   async function loginUser(email, password) {
     const data = await request('/api/collections/users/auth-with-password', {
       method: 'POST', body: { identity: email, password },
@@ -291,7 +307,7 @@ const Api = (() => {
   }
 
   return {
-    currentUser, getUserSession, authenticateAccount, logoutUser,
+    currentUser, getUserSession, refreshCurrentUser, authenticateAccount, logoutUser,
     isAdminUnlocked, adminLogin, adminLogout,
     listApproved, listMine, listAllForAdmin, getListing,
     createListing, updateListing, updateListingStatus, deleteListing, photoUrl,
